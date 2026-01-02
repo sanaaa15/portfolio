@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Caveat:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Schoolbell&display=swap');
 
 @layer base {
   :root {
@@ -105,7 +105,7 @@
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Caveat', cursive;
+    font-family: 'Schoolbell', cursive;
   }
 }
 

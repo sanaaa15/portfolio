@@ -1,32 +1,45 @@
 import { motion } from "framer-motion";
 import profilePhoto from "@/assets/profile-photo.png";
-import { Sparkles, Heart, Star } from "lucide-react";
+import { Sparkles, Heart, Star, Cloud, Moon, Flower2, Candy } from "lucide-react";
 
-const IntroSection = () => {
+interface IntroSectionProps {
+  onOpenGame: () => void;
+}
+
+const IntroSection = ({ onOpenGame }: IntroSectionProps) => {
+  const floatingElements = [
+    { Icon: Star, className: "absolute top-20 left-10 text-tab-pink", animateY: [-10, 10, -10], animateRotate: [0, 10, 0], delay: 0 },
+    { Icon: Heart, className: "absolute top-40 right-20 text-tab-lavender", animateY: [10, -10, 10], animateRotate: [0, -10, 0], delay: 0.5 },
+    { Icon: Sparkles, className: "absolute bottom-32 left-20 text-tab-mint", animateY: [-5, 15, -5], delay: 1 },
+    { Icon: Cloud, className: "absolute top-32 right-1/3 text-tab-yellow", animateY: [5, -15, 5], animateX: [-5, 5, -5], delay: 1.5 },
+    { Icon: Flower2, className: "absolute bottom-48 right-16 text-tab-peach", animateRotate: [0, 360], delay: 2 },
+    { Icon: Moon, className: "absolute top-1/2 left-8 text-tab-pink", animateY: [-8, 8, -8], animateScale: [1, 1.1, 1], delay: 0.8 },
+    { Icon: Candy, className: "absolute bottom-20 left-1/3 text-tab-lavender", animateY: [10, -5, 10], animateRotate: [-10, 10, -10], delay: 1.2 },
+    { Icon: Star, className: "absolute top-28 left-1/4 text-tab-mint", animateY: [-12, 8, -12], delay: 0.3, size: 5 },
+    { Icon: Heart, className: "absolute bottom-40 right-1/4 text-tab-yellow", animateScale: [1, 1.2, 1], animateRotate: [0, 180, 360], delay: 1.8 },
+  ];
+
   return (
     <section className="min-h-screen flex items-center justify-center px-4 py-12 relative overflow-hidden">
-      {/* Floating decorative elements */}
-      <motion.div
-        className="absolute top-20 left-10 text-tab-pink"
-        animate={{ y: [-10, 10, -10], rotate: [0, 10, 0] }}
-        transition={{ duration: 4, repeat: Infinity }}
-      >
-        <Star className="w-8 h-8 fill-current" />
-      </motion.div>
-      <motion.div
-        className="absolute top-40 right-20 text-tab-lavender"
-        animate={{ y: [10, -10, 10], rotate: [0, -10, 0] }}
-        transition={{ duration: 3.5, repeat: Infinity }}
-      >
-        <Heart className="w-6 h-6 fill-current" />
-      </motion.div>
-      <motion.div
-        className="absolute bottom-32 left-20 text-tab-mint"
-        animate={{ y: [-5, 15, -5] }}
-        transition={{ duration: 5, repeat: Infinity }}
-      >
-        <Sparkles className="w-10 h-10" />
-      </motion.div>
+      {/* Floating decorative elements - clickable to open game */}
+      {floatingElements.map(({ Icon, className, animateY, animateRotate, animateScale, animateX, delay, size }, index) => (
+        <motion.button
+          key={index}
+          className={`${className} cursor-pointer hover:scale-125 transition-transform`}
+          animate={{ 
+            y: animateY, 
+            rotate: animateRotate, 
+            scale: animateScale,
+            x: animateX
+          }}
+          transition={{ duration: 4, repeat: Infinity, delay }}
+          onClick={onOpenGame}
+          whileHover={{ scale: 1.3 }}
+          whileTap={{ scale: 0.9 }}
+        >
+          <Icon className={`w-${size || 8} h-${size || 8} fill-current`} style={{ width: size ? `${size * 4}px` : '32px', height: size ? `${size * 4}px` : '32px' }} />
+        </motion.button>
+      ))}
 
       {/* Main content - stacked paper effect */}
       <div className="relative max-w-4xl mx-auto">
@@ -126,9 +139,9 @@ const IntroSection = () => {
         </motion.div>
       </div>
 
-      {/* Scroll indicator */}
+      {/* Scroll indicator - centered */}
       <motion.div 
-        className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex flex-col items-center gap-2"
+        className="absolute bottom-8 left-0 right-0 flex flex-col items-center gap-2"
         animate={{ y: [0, 10, 0] }}
         transition={{ duration: 2, repeat: Infinity }}
       >
@@ -141,6 +154,16 @@ const IntroSection = () => {
           />
         </div>
       </motion.div>
+
+      {/* Hint for hidden game */}
+      <motion.p
+        className="absolute bottom-2 left-0 right-0 text-center text-muted-foreground/50 text-xs"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 3 }}
+      >
+        ✨ Click a floating icon to play a game ✨
+      </motion.p>
     </section>
   );
 };

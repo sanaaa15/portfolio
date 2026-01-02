@@ -1,11 +1,18 @@
+import { useRef } from "react";
 import IntroSection from "@/components/IntroSection";
 import ProjectsSection from "@/components/ProjectsSection";
 import FolderSection from "@/components/FolderSection";
-import HiddenGame from "@/components/HiddenGame";
+import HiddenGame, { HiddenGameRef } from "@/components/HiddenGame";
 import Footer from "@/components/Footer";
 import { motion } from "framer-motion";
 
 const Index = () => {
+  const gameRef = useRef<HiddenGameRef>(null);
+
+  const handleOpenGame = () => {
+    gameRef.current?.openGame();
+  };
+
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
       {/* Decorative background elements */}
@@ -39,14 +46,14 @@ const Index = () => {
 
       {/* Main content */}
       <main className="relative z-10">
-        <IntroSection />
+        <IntroSection onOpenGame={handleOpenGame} />
         <ProjectsSection />
         <FolderSection />
         <Footer />
       </main>
 
-      {/* Hidden game button */}
-      <HiddenGame />
+      {/* Hidden game */}
+      <HiddenGame ref={gameRef} />
     </div>
   );
 };
