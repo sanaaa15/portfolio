@@ -16,6 +16,7 @@ export default {
       fontFamily: {
         sans: ['Quicksand', 'sans-serif'],
         display: ['Caveat', 'cursive'],
+        heading: ['Schoolbell', 'cursive'],
       },
       colors: {
         border: "hsl(var(--border))",

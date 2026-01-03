@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import profilePhoto from "@/assets/profile-photo.png";
-import { Sparkles, Heart, Star, Cloud, Moon, Flower2, Candy } from "lucide-react";
+import { Sparkles, Heart, Star, Cloud, Moon, Flower, Candy } from "lucide-react";
 
 interface IntroSectionProps {
   onOpenGame: () => void;
@@ -12,7 +12,7 @@ const IntroSection = ({ onOpenGame }: IntroSectionProps) => {
     { Icon: Heart, className: "absolute top-40 right-20 text-tab-lavender", animateY: [10, -10, 10], animateRotate: [0, -10, 0], delay: 0.5 },
     { Icon: Sparkles, className: "absolute bottom-32 left-20 text-tab-mint", animateY: [-5, 15, -5], delay: 1 },
     { Icon: Cloud, className: "absolute top-32 right-1/3 text-tab-yellow", animateY: [5, -15, 5], animateX: [-5, 5, -5], delay: 1.5 },
-    { Icon: Flower2, className: "absolute bottom-48 right-16 text-tab-peach", animateRotate: [0, 360], delay: 2 },
+    { Icon: Flower, className: "absolute bottom-48 right-16 text-tab-peach", animateRotate: [0, 360], delay: 2 },
     { Icon: Moon, className: "absolute top-1/2 left-8 text-tab-pink", animateY: [-8, 8, -8], animateScale: [1, 1.1, 1], delay: 0.8 },
     { Icon: Candy, className: "absolute bottom-20 left-1/3 text-tab-lavender", animateY: [10, -5, 10], animateRotate: [-10, 10, -10], delay: 1.2 },
     { Icon: Star, className: "absolute top-28 left-1/4 text-tab-mint", animateY: [-12, 8, -12], delay: 0.3, size: 5 },
@@ -22,22 +22,21 @@ const IntroSection = ({ onOpenGame }: IntroSectionProps) => {
   return (
     <section className="min-h-screen flex items-center justify-center px-4 py-12 relative overflow-hidden">
       {/* Floating decorative elements - clickable to open game */}
-      {floatingElements.map(({ Icon, className, animateY, animateRotate, animateScale, animateX, delay, size }, index) => (
+      {floatingElements.map(({ Icon, className, animateY, animateRotate, animateScale, delay }, index) => (
         <motion.button
           key={index}
           className={`${className} cursor-pointer hover:scale-125 transition-transform`}
           animate={{ 
             y: animateY, 
             rotate: animateRotate, 
-            scale: animateScale,
-            x: animateX
+            scale: animateScale
           }}
           transition={{ duration: 4, repeat: Infinity, delay }}
           onClick={onOpenGame}
           whileHover={{ scale: 1.3 }}
           whileTap={{ scale: 0.9 }}
         >
-          <Icon className={`w-${size || 8} h-${size || 8} fill-current`} style={{ width: size ? `${size * 4}px` : '32px', height: size ? `${size * 4}px` : '32px' }} />
+          <Icon className="w-8 h-8 fill-current" style={{ width: '32px', height: '32px' }} />
         </motion.button>
       ))}
 
@@ -95,7 +94,7 @@ const IntroSection = ({ onOpenGame }: IntroSectionProps) => {
                 transition={{ delay: 0.4 }}
               >
                 <p className="text-muted-foreground font-medium mb-2">Hello, I'm</p>
-                <h1 className="text-5xl md:text-7xl font-display font-bold text-foreground mb-4">
+                <h1 className="text-5xl md:text-7xl font-heading font-bold text-foreground mb-4">
                   Sana Suman
                 </h1>
                 <div className="inline-block bg-primary/30 px-4 py-2 rounded-full mb-4">

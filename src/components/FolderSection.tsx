@@ -112,7 +112,7 @@ const FolderSection = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
         >
-          <h2 className="text-5xl md:text-6xl font-display font-bold text-foreground mb-4">
+          <h2 className="text-5xl md:text-6xl font-heading font-bold text-foreground mb-4">
             My Journey
           </h2>
           <p className="text-muted-foreground">Open a folder tab to explore!</p>
@@ -125,81 +125,125 @@ const FolderSection = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
         >
+          {/* Background folder layers for depth - change based on active tab */}
+          <div className={`absolute inset-0 top-12 rounded-2xl rounded-tl-none transform translate-y-2 translate-x-1 ${
+            activeTab === 'work' ? 'bg-paper-lavender' :
+            activeTab === 'publications' ? 'bg-paper-mint' :
+            'bg-paper-pink'
+          }`} />
+          <div className={`absolute inset-0 top-12 rounded-2xl rounded-tl-none transform translate-y-4 translate-x-2 ${
+            activeTab === 'work' ? 'bg-paper-mint' :
+            activeTab === 'publications' ? 'bg-paper-pink' :
+            'bg-paper-lavender'
+          }`} />
+
           {/* Folder tabs at top */}
-          <div className="flex gap-1 mb-0 relative z-10">
-            {tabs.map((tab, index) => (
-              <motion.button
+          <div className="flex gap-0 relative z-10">
+            {tabs.map((tab) => (
+              <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`relative px-6 py-3 rounded-t-xl font-medium flex items-center gap-2 transition-all ${
+                className={`relative px-6 py-4 font-medium flex items-center gap-2 transition-colors ${
                   activeTab === tab.id
-                    ? `${tab.color} shadow-md`
-                    : "bg-paper-cream/70 hover:bg-paper-cream"
+                    ? `${tab.color} rounded-t-2xl`
+                    : "bg-paper-cream/50 hover:bg-paper-cream/80"
                 }`}
-                whileHover={{ y: -3 }}
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: index * 0.1 }}
               >
                 {tab.icon}
                 <span className="hidden sm:inline">{tab.label}</span>
-              </motion.button>
+              </button>
             ))}
           </div>
 
           {/* Folder body */}
           <div className="relative">
-            {/* Background folder layers */}
-            <div className="absolute inset-0 bg-paper-lavender rounded-2xl rounded-tl-none transform translate-y-1" />
-            <div className="absolute inset-0 bg-paper-mint rounded-2xl rounded-tl-none transform translate-y-2 translate-x-1" />
-            
             {/* Main folder content */}
-            <div className="relative bg-paper-cream rounded-2xl rounded-tl-none p-6 md:p-10 shadow-paper-lg paper-texture min-h-[500px]">
+            <motion.div 
+              className={`relative rounded-2xl rounded-tl-none p-6 md:p-10 shadow-paper-lg paper-texture min-h-[500px] ${
+                activeTab === 'work' ? 'bg-tab-pink' :
+                activeTab === 'publications' ? 'bg-tab-lavender' :
+                'bg-tab-mint'
+              }`}
+              animate={{ 
+                boxShadow: [
+                  "6px 6px 0 hsl(var(--paper-pink)), 12px 12px 0 hsl(var(--paper-lavender))",
+                  "8px 8px 0 hsl(var(--paper-pink)), 16px 16px 0 hsl(var(--paper-lavender))",
+                  "6px 6px 0 hsl(var(--paper-pink)), 12px 12px 0 hsl(var(--paper-lavender))"
+                ]
+              }}
+              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+            >
               <AnimatePresence mode="wait">
                 {/* Work History */}
                 {activeTab === "work" && (
                   <motion.div
                     key="work"
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 20 }}
+                    initial={{ opacity: 0, x: -30, scale: 0.95 }}
+                    animate={{ opacity: 1, x: 0, scale: 1 }}
+                    exit={{ opacity: 0, x: 30, scale: 0.95 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 25 }}
                     className="space-y-6"
                   >
-                    <h3 className="text-3xl font-display font-bold text-foreground flex items-center gap-3">
-                      <Briefcase className="w-8 h-8 text-tab-pink" />
+                    <motion.h3 
+                      className="text-3xl font-display font-bold text-white flex items-center gap-3"
+                      initial={{ y: -20, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      transition={{ delay: 0.1 }}
+                    >
+                      <motion.div
+                        animate={{ rotate: [0, 15, -15, 0] }}
+                        transition={{ duration: 0.6, delay: 0.2 }}
+                      >
+                        <Briefcase className="w-8 h-8 text-white" />
+                      </motion.div>
                       Work Experience
-                    </h3>
+                    </motion.h3>
                     <div className="space-y-6">
                       {workHistory.map((job, index) => (
                         <motion.div
                           key={index}
-                          className="relative pl-8 border-l-4 border-tab-pink/50"
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: index * 0.1 }}
+                          className="relative pl-8 border-l-4 border-white/50"
+                          initial={{ opacity: 0, y: 20, x: -10 }}
+                          animate={{ opacity: 1, y: 0, x: 0 }}
+                          transition={{ 
+                            delay: 0.2 + index * 0.1,
+                            type: "spring",
+                            stiffness: 200,
+                            damping: 20
+                          }}
+                          whileHover={{ x: 5, transition: { duration: 0.2 } }}
                         >
                           {/* Timeline dot */}
-                          <div className="absolute -left-2.5 top-1 w-5 h-5 bg-tab-pink rounded-full border-4 border-paper-cream" />
+                          <motion.div 
+                            className="absolute -left-2.5 top-1 w-5 h-5 bg-white rounded-full border-4 border-tab-pink"
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            transition={{ delay: 0.2 + index * 0.1, type: "spring", stiffness: 300 }}
+                          />
                           
-                          <div className="bg-paper-pink/30 rounded-xl p-5">
+                          <motion.div 
+                            className="bg-white/70 rounded-xl p-5 backdrop-blur-sm"
+                            whileHover={{ scale: 1.02, boxShadow: "0 4px 20px rgba(0,0,0,0.1)" }}
+                            transition={{ duration: 0.2 }}
+                          >
                             <div className="flex flex-wrap items-center gap-2 mb-2">
-                              <h4 className="font-bold text-foreground text-lg">{job.title}</h4>
-                              <span className="px-2 py-0.5 bg-tab-pink/50 rounded-full text-sm">
+                              <h4 className="font-bold text-pink-900 text-lg">{job.title}</h4>
+                              <span className="px-2 py-0.5 bg-pink-200 rounded-full text-sm text-pink-900">
                                 @ {job.company}
                               </span>
-                              <span className="text-muted-foreground text-sm ml-auto">
+                              <span className="text-pink-800 text-sm ml-auto">
                                 {job.period}
                               </span>
                             </div>
                             <ul className="space-y-2">
                               {job.description.map((desc, i) => (
-                                <li key={i} className="text-foreground/80 text-sm flex gap-2">
-                                  <span className="text-tab-pink">✦</span>
+                                <li key={i} className="text-pink-800 text-sm flex gap-2">
+                                  <span className="text-pink-900 font-bold">✦</span>
                                   {desc}
                                 </li>
                               ))}
                             </ul>
-                          </div>
+                          </motion.div>
                         </motion.div>
                       ))}
                     </div>
@@ -210,27 +254,48 @@ const FolderSection = () => {
                 {activeTab === "publications" && (
                   <motion.div
                     key="publications"
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 20 }}
+                    initial={{ opacity: 0, x: -30, scale: 0.95 }}
+                    animate={{ opacity: 1, x: 0, scale: 1 }}
+                    exit={{ opacity: 0, x: 30, scale: 0.95 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 25 }}
                     className="space-y-6"
                   >
-                    <h3 className="text-3xl font-display font-bold text-foreground flex items-center gap-3">
-                      <BookOpen className="w-8 h-8 text-tab-lavender" />
+                    <motion.h3 
+                      className="text-3xl font-display font-bold text-white flex items-center gap-3"
+                      initial={{ y: -20, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      transition={{ delay: 0.1 }}
+                    >
+                      <motion.div
+                        animate={{ rotate: [0, 15, -15, 0] }}
+                        transition={{ duration: 0.6, delay: 0.2 }}
+                      >
+                        <BookOpen className="w-8 h-8 text-white" />
+                      </motion.div>
                       Research & Publications
-                    </h3>
+                    </motion.h3>
                     <div className="space-y-6">
                       {publications.map((pub, index) => (
                         <motion.div
                           key={index}
-                          className="bg-paper-lavender/30 rounded-xl p-6"
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: index * 0.15 }}
+                          className="bg-white/70 backdrop-blur-sm rounded-xl p-6"
+                          initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          transition={{ 
+                            delay: 0.2 + index * 0.15,
+                            type: "spring",
+                            stiffness: 200,
+                            damping: 20
+                          }}
+                          whileHover={{ 
+                            scale: 1.03, 
+                            boxShadow: "0 8px 30px rgba(0,0,0,0.12)",
+                            transition: { duration: 0.2 }
+                          }}
                         >
                           <div className="flex flex-wrap items-center gap-2 mb-4">
-                            <h4 className="font-bold text-foreground text-xl">{pub.title}</h4>
-                            <span className="px-3 py-1 bg-tab-lavender/50 rounded-full text-sm">
+                            <h4 className="font-bold text-purple-900 text-xl">{pub.title}</h4>
+                            <span className="px-3 py-1 bg-purple-200 rounded-full text-sm text-purple-900">
                               {pub.type}
                             </span>
                           </div>
@@ -241,7 +306,7 @@ const FolderSection = () => {
                                 href={link.url}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-tab-lavender text-foreground rounded-lg hover:opacity-80 transition-opacity text-sm font-medium"
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-purple-900 text-white rounded-lg hover:bg-purple-950 transition-colors text-sm font-medium"
                               >
                                 <ExternalLink className="w-3.5 h-3.5" />
                                 {link.label}
@@ -258,41 +323,60 @@ const FolderSection = () => {
                 {activeTab === "education" && (
                   <motion.div
                     key="education"
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 20 }}
+                    initial={{ opacity: 0, x: -30, scale: 0.95 }}
+                    animate={{ opacity: 1, x: 0, scale: 1 }}
+                    exit={{ opacity: 0, x: 30, scale: 0.95 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 25 }}
                     className="space-y-6"
                   >
-                    <h3 className="text-3xl font-display font-bold text-foreground flex items-center gap-3">
-                      <GraduationCap className="w-8 h-8 text-tab-mint" />
+                    <motion.h3 
+                      className="text-3xl font-display font-bold text-white flex items-center gap-3"
+                      initial={{ y: -20, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      transition={{ delay: 0.1 }}
+                    >
+                      <motion.div
+                        animate={{ rotate: [0, 15, -15, 0] }}
+                        transition={{ duration: 0.6, delay: 0.2 }}
+                      >
+                        <GraduationCap className="w-8 h-8 text-white" />
+                      </motion.div>
                       Education
-                    </h3>
+                    </motion.h3>
                     <div className="space-y-6">
                       {education.map((edu, index) => (
                         <motion.div
                           key={index}
-                          className="bg-paper-mint/30 rounded-xl p-8"
-                          initial={{ opacity: 0, scale: 0.95 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          transition={{ delay: index * 0.15 }}
+                          className="bg-white/60 backdrop-blur-sm rounded-xl p-8"
+                          initial={{ opacity: 0, scale: 0.9, rotateX: -15 }}
+                          animate={{ opacity: 1, scale: 1, rotateX: 0 }}
+                          transition={{ 
+                            delay: 0.2 + index * 0.1,
+                            type: "spring",
+                            stiffness: 200,
+                            damping: 20
+                          }}
+                          whileHover={{ 
+                            scale: 1.03, 
+                            rotateZ: 1,
+                            boxShadow: "0 10px 40px rgba(0,0,0,0.15)",
+                            transition: { duration: 0.3 }
+                          }}
                         >
-                          <div className="flex items-start gap-4">
-                            <div className="p-3 bg-tab-mint rounded-xl">
-                              <GraduationCap className="w-8 h-8 text-foreground" />
-                            </div>
+                          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
                             <div>
-                              <h4 className="font-bold text-foreground text-xl mb-1">
+                              <h4 className="font-bold text-green-900 text-2xl mb-1">
                                 {edu.degree}
                               </h4>
-                              <p className="text-muted-foreground font-medium mb-2">
+                              <p className="text-green-800 text-lg font-medium mb-2">
                                 {edu.school}
                               </p>
                               <div className="flex items-center gap-3">
-                                <span className="px-3 py-1 bg-tab-mint/50 rounded-full text-sm">
+                                <span className="px-3 py-1 bg-green-200 rounded-full text-sm text-green-900">
                                   {edu.period}
                                 </span>
                                 {edu.details && (
-                                  <span className="text-foreground/70 text-sm">
+                                  <span className="text-green-800 text-sm italic">
                                     {edu.details}
                                   </span>
                                 )}
@@ -310,7 +394,7 @@ const FolderSection = () => {
               <div className="absolute bottom-4 right-4 text-6xl opacity-10 font-display">
                 📁
               </div>
-            </div>
+            </motion.div>
           </div>
         </motion.div>
       </div>

@@ -12,6 +12,28 @@ export interface HiddenGameRef {
   openGame: () => void;
 }
 
+// LocalStorage key for leaderboard
+const LEADERBOARD_KEY = "starCatcher_leaderboard";
+
+// Helper functions for leaderboard management
+const getLeaderboard = (): LeaderboardEntry[] => {
+  try {
+    const stored = localStorage.getItem(LEADERBOARD_KEY);
+    return stored ? JSON.parse(stored) : [];
+  } catch (error) {
+    console.error("Error reading leaderboard:", error);
+    return [];
+  }
+};
+
+const saveLeaderboard = (entries: LeaderboardEntry[]) => {
+  try {
+    localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(entries));
+  } catch (error) {
+    console.error("Error saving leaderboard:", error);
+  }
+};
+
 const HiddenGame = forwardRef<HiddenGameRef>((_, ref) => {
   const [isOpen, setIsOpen] = useState(false);
   const [score, setScore] = useState(0);
@@ -19,15 +41,14 @@ const HiddenGame = forwardRef<HiddenGameRef>((_, ref) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [gameOver, setGameOver] = useState(false);
   const [playerName, setPlayerName] = useState("");
-  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([
-    { name: "Sana ⭐", score: 42, date: "2024-01-01" },
-    { name: "Cutie Pie", score: 38, date: "2024-01-02" },
-    { name: "Star Player", score: 35, date: "2024-01-03" },
-    { name: "Lucky Duck", score: 30, date: "2024-01-04" },
-    { name: "Sparkle", score: 25, date: "2024-01-05" },
-  ]);
+  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [starPosition, setStarPosition] = useState({ x: 50, y: 50 });
   const [showNameInput, setShowNameInput] = useState(false);
+
+  // Load leaderboard from localStorage on mount
+  useEffect(() => {
+    setLeaderboard(getLeaderboard());
+  }, []);
 
   useImperativeHandle(ref, () => ({
     openGame: () => setIsOpen(true),
@@ -66,9 +87,10 @@ const HiddenGame = forwardRef<HiddenGameRef>((_, ref) => {
 
     const updatedLeaderboard = [...leaderboard, newEntry]
       .sort((a, b) => b.score - a.score)
-      .slice(0, 5);
+      .slice(0, 10); // Keep top 10 scores
 
     setLeaderboard(updatedLeaderboard);
+    saveLeaderboard(updatedLeaderboard);
     setShowNameInput(false);
     setPlayerName("");
   };
@@ -231,37 +253,43 @@ const HiddenGame = forwardRef<HiddenGameRef>((_, ref) => {
             <div className="mt-6 pt-6 border-t-2 border-dashed border-primary/20">
               <h4 className="text-xl font-display font-bold text-foreground flex items-center gap-2 mb-4">
                 <Trophy className="w-5 h-5 text-tab-yellow" />
-                Top 5 Star Catchers
+                Top 10 Star Catchers
               </h4>
               <div className="space-y-2">
-                {leaderboard.map((entry, index) => (
-                  <motion.div
-                    key={`${entry.name}-${entry.score}`}
-                    className={`flex items-center gap-3 px-4 py-2 rounded-xl ${
-                      index === 0
-                        ? "bg-tab-yellow/30"
-                        : index === 1
-                        ? "bg-tab-lavender/30"
-                        : index === 2
-                        ? "bg-tab-pink/30"
-                        : "bg-paper-mint/30"
-                    }`}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                  >
-                    <span className="font-bold text-foreground w-6">
-                      {index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : `${index + 1}.`}
-                    </span>
-                    <span className="flex-1 font-medium text-foreground truncate">
-                      {entry.name}
-                    </span>
-                    <span className="font-bold text-foreground flex items-center gap-1">
-                      {entry.score}
-                      <Star className="w-4 h-4 text-tab-yellow fill-current" />
-                    </span>
-                  </motion.div>
-                ))}
+                {leaderboard.length === 0 ? (
+                  <p className="text-center text-muted-foreground py-4">
+                    No scores yet! Be the first to play! ✨
+                  </p>
+                ) : (
+                  leaderboard.slice(0, 5).map((entry, index) => (
+                    <motion.div
+                      key={`${entry.name}-${entry.score}-${entry.date}`}
+                      className={`flex items-center gap-3 px-4 py-2 rounded-xl ${
+                        index === 0
+                          ? "bg-tab-yellow/30"
+                          : index === 1
+                          ? "bg-tab-lavender/30"
+                          : index === 2
+                          ? "bg-tab-pink/30"
+                          : "bg-paper-mint/30"
+                      }`}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                    >
+                      <span className="font-bold text-foreground w-6">
+                        {index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : `${index + 1}.`}
+                      </span>
+                      <span className="flex-1 font-medium text-foreground truncate">
+                        {entry.name}
+                      </span>
+                      <span className="font-bold text-foreground flex items-center gap-1">
+                        {entry.score}
+                        <Star className="w-4 h-4 text-tab-yellow fill-current" />
+                      </span>
+                    </motion.div>
+                  ))
+                )}
               </div>
             </div>
           </motion.div>
