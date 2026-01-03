@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Schoolbell&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Schoolbell&family=Nunito:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -101,11 +101,18 @@
 
   body {
     @apply bg-background text-foreground font-sans;
-    font-family: 'Quicksand', sans-serif;
+    font-family: 'Nunito', sans-serif;
+    background-image: 
+      url("data:image/svg+xml,%3Csvg width='200' height='200' viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E"),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cdefs%3E%3Cpattern id='wrinkle' patternUnits='userSpaceOnUse' width='100' height='100'%3E%3Cpath d='M0 50 Q25 45 50 50 T100 50' fill='none' stroke='%23e8d5c4' stroke-width='0.5' opacity='0.3'/%3E%3Cpath d='M0 25 Q25 20 50 25 T100 25' fill='none' stroke='%23e8d5c4' stroke-width='0.3' opacity='0.2'/%3E%3Cpath d='M0 75 Q25 80 50 75 T100 75' fill='none' stroke='%23e8d5c4' stroke-width='0.3' opacity='0.2'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100' height='100' fill='url(%23wrinkle)'/%3E%3C/svg%3E");
   }
 
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Schoolbell', cursive;
+  }
+
+  p, span, a, button, input, li {
+    font-family: 'Nunito', sans-serif;
   }
 }
 

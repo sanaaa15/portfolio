@@ -96,11 +96,13 @@ const education: Education[] = [
 const FolderSection = () => {
   const [activeTab, setActiveTab] = useState<TabType>("work");
 
-  const tabs: { id: TabType; label: string; icon: React.ReactNode; color: string }[] = [
-    { id: "work", label: "Work", icon: <Briefcase className="w-5 h-5" />, color: "bg-tab-pink" },
-    { id: "publications", label: "Publications", icon: <BookOpen className="w-5 h-5" />, color: "bg-tab-lavender" },
-    { id: "education", label: "Education", icon: <GraduationCap className="w-5 h-5" />, color: "bg-tab-mint" },
+  const tabs: { id: TabType; label: string; icon: React.ReactNode; bgColor: string; lightBg: string }[] = [
+    { id: "work", label: "Work", icon: <Briefcase className="w-5 h-5" />, bgColor: "bg-rose-200", lightBg: "bg-rose-100" },
+    { id: "publications", label: "Publications", icon: <BookOpen className="w-5 h-5" />, bgColor: "bg-violet-200", lightBg: "bg-violet-100" },
+    { id: "education", label: "Education", icon: <GraduationCap className="w-5 h-5" />, bgColor: "bg-emerald-200", lightBg: "bg-emerald-100" },
   ];
+
+  const activeTabConfig = tabs.find(t => t.id === activeTab)!;
 
   return (
     <section className="min-h-screen py-20 px-4 relative">
@@ -125,16 +127,16 @@ const FolderSection = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
         >
-          {/* Background folder layers for depth - change based on active tab */}
+          {/* Background folder layers for depth */}
           <div className={`absolute inset-0 top-12 rounded-2xl rounded-tl-none transform translate-y-2 translate-x-1 ${
-            activeTab === 'work' ? 'bg-paper-lavender' :
-            activeTab === 'publications' ? 'bg-paper-mint' :
-            'bg-paper-pink'
+            activeTab === 'work' ? 'bg-violet-100' :
+            activeTab === 'publications' ? 'bg-emerald-100' :
+            'bg-rose-100'
           }`} />
           <div className={`absolute inset-0 top-12 rounded-2xl rounded-tl-none transform translate-y-4 translate-x-2 ${
-            activeTab === 'work' ? 'bg-paper-mint' :
-            activeTab === 'publications' ? 'bg-paper-pink' :
-            'bg-paper-lavender'
+            activeTab === 'work' ? 'bg-emerald-100' :
+            activeTab === 'publications' ? 'bg-rose-100' :
+            'bg-violet-100'
           }`} />
 
           {/* Folder tabs at top */}
@@ -143,10 +145,10 @@ const FolderSection = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`relative px-6 py-4 font-medium flex items-center gap-2 transition-colors ${
+                className={`relative px-6 py-4 font-medium flex items-center gap-2 transition-all ${
                   activeTab === tab.id
-                    ? `${tab.color} rounded-t-2xl`
-                    : "bg-paper-cream/50 hover:bg-paper-cream/80"
+                    ? `${tab.bgColor} rounded-t-2xl shadow-sm`
+                    : "bg-muted/50 hover:bg-muted/80 rounded-t-lg"
                 }`}
               >
                 {tab.icon}
@@ -159,19 +161,7 @@ const FolderSection = () => {
           <div className="relative">
             {/* Main folder content */}
             <motion.div 
-              className={`relative rounded-2xl rounded-tl-none p-6 md:p-10 shadow-paper-lg paper-texture min-h-[500px] ${
-                activeTab === 'work' ? 'bg-tab-pink' :
-                activeTab === 'publications' ? 'bg-tab-lavender' :
-                'bg-tab-mint'
-              }`}
-              animate={{ 
-                boxShadow: [
-                  "6px 6px 0 hsl(var(--paper-pink)), 12px 12px 0 hsl(var(--paper-lavender))",
-                  "8px 8px 0 hsl(var(--paper-pink)), 16px 16px 0 hsl(var(--paper-lavender))",
-                  "6px 6px 0 hsl(var(--paper-pink)), 12px 12px 0 hsl(var(--paper-lavender))"
-                ]
-              }}
-              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+              className={`relative rounded-2xl rounded-tl-none p-6 md:p-10 shadow-lg paper-texture min-h-[500px] ${activeTabConfig.lightBg} border-2 border-${activeTabConfig.bgColor.replace('bg-', '')}/50`}
             >
               <AnimatePresence mode="wait">
                 {/* Work History */}
@@ -185,7 +175,7 @@ const FolderSection = () => {
                     className="space-y-6"
                   >
                     <motion.h3 
-                      className="text-3xl font-display font-bold text-white flex items-center gap-3"
+                      className="text-3xl font-heading font-bold text-rose-800 flex items-center gap-3"
                       initial={{ y: -20, opacity: 0 }}
                       animate={{ y: 0, opacity: 1 }}
                       transition={{ delay: 0.1 }}
@@ -194,7 +184,7 @@ const FolderSection = () => {
                         animate={{ rotate: [0, 15, -15, 0] }}
                         transition={{ duration: 0.6, delay: 0.2 }}
                       >
-                        <Briefcase className="w-8 h-8 text-white" />
+                        <Briefcase className="w-8 h-8 text-rose-600" />
                       </motion.div>
                       Work Experience
                     </motion.h3>
@@ -202,7 +192,7 @@ const FolderSection = () => {
                       {workHistory.map((job, index) => (
                         <motion.div
                           key={index}
-                          className="relative pl-8 border-l-4 border-white/50"
+                          className="relative pl-8 border-l-4 border-rose-300"
                           initial={{ opacity: 0, y: 20, x: -10 }}
                           animate={{ opacity: 1, y: 0, x: 0 }}
                           transition={{ 
@@ -213,32 +203,31 @@ const FolderSection = () => {
                           }}
                           whileHover={{ x: 5, transition: { duration: 0.2 } }}
                         >
-                          {/* Timeline dot */}
                           <motion.div 
-                            className="absolute -left-2.5 top-1 w-5 h-5 bg-white rounded-full border-4 border-tab-pink"
+                            className="absolute -left-2.5 top-1 w-5 h-5 bg-rose-300 rounded-full border-4 border-rose-100"
                             initial={{ scale: 0 }}
                             animate={{ scale: 1 }}
                             transition={{ delay: 0.2 + index * 0.1, type: "spring", stiffness: 300 }}
                           />
                           
                           <motion.div 
-                            className="bg-white/70 rounded-xl p-5 backdrop-blur-sm"
-                            whileHover={{ scale: 1.02, boxShadow: "0 4px 20px rgba(0,0,0,0.1)" }}
+                            className="bg-white/80 rounded-xl p-5 backdrop-blur-sm shadow-sm"
+                            whileHover={{ scale: 1.02, boxShadow: "0 4px 20px rgba(0,0,0,0.08)" }}
                             transition={{ duration: 0.2 }}
                           >
                             <div className="flex flex-wrap items-center gap-2 mb-2">
-                              <h4 className="font-bold text-pink-900 text-lg">{job.title}</h4>
-                              <span className="px-2 py-0.5 bg-pink-200 rounded-full text-sm text-pink-900">
+                              <h4 className="font-bold text-rose-800 text-lg">{job.title}</h4>
+                              <span className="px-2 py-0.5 bg-rose-200 rounded-full text-sm text-rose-800">
                                 @ {job.company}
                               </span>
-                              <span className="text-pink-800 text-sm ml-auto">
+                              <span className="text-rose-600 text-sm ml-auto">
                                 {job.period}
                               </span>
                             </div>
                             <ul className="space-y-2">
                               {job.description.map((desc, i) => (
-                                <li key={i} className="text-pink-800 text-sm flex gap-2">
-                                  <span className="text-pink-900 font-bold">✦</span>
+                                <li key={i} className="text-rose-700 text-sm flex gap-2">
+                                  <span className="text-rose-500 font-bold">✦</span>
                                   {desc}
                                 </li>
                               ))}
@@ -261,7 +250,7 @@ const FolderSection = () => {
                     className="space-y-6"
                   >
                     <motion.h3 
-                      className="text-3xl font-display font-bold text-white flex items-center gap-3"
+                      className="text-3xl font-heading font-bold text-violet-800 flex items-center gap-3"
                       initial={{ y: -20, opacity: 0 }}
                       animate={{ y: 0, opacity: 1 }}
                       transition={{ delay: 0.1 }}
@@ -270,7 +259,7 @@ const FolderSection = () => {
                         animate={{ rotate: [0, 15, -15, 0] }}
                         transition={{ duration: 0.6, delay: 0.2 }}
                       >
-                        <BookOpen className="w-8 h-8 text-white" />
+                        <BookOpen className="w-8 h-8 text-violet-600" />
                       </motion.div>
                       Research & Publications
                     </motion.h3>
@@ -278,7 +267,7 @@ const FolderSection = () => {
                       {publications.map((pub, index) => (
                         <motion.div
                           key={index}
-                          className="bg-white/70 backdrop-blur-sm rounded-xl p-6"
+                          className="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-sm"
                           initial={{ opacity: 0, y: 20, scale: 0.95 }}
                           animate={{ opacity: 1, y: 0, scale: 1 }}
                           transition={{ 
@@ -289,13 +278,13 @@ const FolderSection = () => {
                           }}
                           whileHover={{ 
                             scale: 1.03, 
-                            boxShadow: "0 8px 30px rgba(0,0,0,0.12)",
+                            boxShadow: "0 8px 30px rgba(0,0,0,0.08)",
                             transition: { duration: 0.2 }
                           }}
                         >
                           <div className="flex flex-wrap items-center gap-2 mb-4">
-                            <h4 className="font-bold text-purple-900 text-xl">{pub.title}</h4>
-                            <span className="px-3 py-1 bg-purple-200 rounded-full text-sm text-purple-900">
+                            <h4 className="font-bold text-violet-800 text-xl">{pub.title}</h4>
+                            <span className="px-3 py-1 bg-violet-200 rounded-full text-sm text-violet-800">
                               {pub.type}
                             </span>
                           </div>
@@ -306,7 +295,7 @@ const FolderSection = () => {
                                 href={link.url}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-purple-900 text-white rounded-lg hover:bg-purple-950 transition-colors text-sm font-medium"
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition-colors text-sm font-medium"
                               >
                                 <ExternalLink className="w-3.5 h-3.5" />
                                 {link.label}
@@ -330,7 +319,7 @@ const FolderSection = () => {
                     className="space-y-6"
                   >
                     <motion.h3 
-                      className="text-3xl font-display font-bold text-white flex items-center gap-3"
+                      className="text-3xl font-heading font-bold text-emerald-800 flex items-center gap-3"
                       initial={{ y: -20, opacity: 0 }}
                       animate={{ y: 0, opacity: 1 }}
                       transition={{ delay: 0.1 }}
@@ -339,7 +328,7 @@ const FolderSection = () => {
                         animate={{ rotate: [0, 15, -15, 0] }}
                         transition={{ duration: 0.6, delay: 0.2 }}
                       >
-                        <GraduationCap className="w-8 h-8 text-white" />
+                        <GraduationCap className="w-8 h-8 text-emerald-600" />
                       </motion.div>
                       Education
                     </motion.h3>
@@ -347,7 +336,7 @@ const FolderSection = () => {
                       {education.map((edu, index) => (
                         <motion.div
                           key={index}
-                          className="bg-white/60 backdrop-blur-sm rounded-xl p-8"
+                          className="bg-white/80 backdrop-blur-sm rounded-xl p-8 shadow-sm"
                           initial={{ opacity: 0, scale: 0.9, rotateX: -15 }}
                           animate={{ opacity: 1, scale: 1, rotateX: 0 }}
                           transition={{ 
@@ -359,24 +348,24 @@ const FolderSection = () => {
                           whileHover={{ 
                             scale: 1.03, 
                             rotateZ: 1,
-                            boxShadow: "0 10px 40px rgba(0,0,0,0.15)",
+                            boxShadow: "0 10px 40px rgba(0,0,0,0.1)",
                             transition: { duration: 0.3 }
                           }}
                         >
                           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
                             <div>
-                              <h4 className="font-bold text-green-900 text-2xl mb-1">
+                              <h4 className="font-bold text-emerald-800 text-2xl mb-1">
                                 {edu.degree}
                               </h4>
-                              <p className="text-green-800 text-lg font-medium mb-2">
+                              <p className="text-emerald-700 text-lg font-medium mb-2">
                                 {edu.school}
                               </p>
                               <div className="flex items-center gap-3">
-                                <span className="px-3 py-1 bg-green-200 rounded-full text-sm text-green-900">
+                                <span className="px-3 py-1 bg-emerald-200 rounded-full text-sm text-emerald-800">
                                   {edu.period}
                                 </span>
                                 {edu.details && (
-                                  <span className="text-green-800 text-sm italic">
+                                  <span className="text-emerald-600 text-sm italic">
                                     {edu.details}
                                   </span>
                                 )}
