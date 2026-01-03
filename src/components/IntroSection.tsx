@@ -1,42 +1,43 @@
 import { motion } from "framer-motion";
 import profilePhoto from "@/assets/profile-photo.png";
-import { Sparkles, Heart, Star, Cloud, Moon, Flower, Candy } from "lucide-react";
+import { Paperclip, Star, Heart, Cloud, Snowflake, Smile, Sparkles } from "lucide-react";
 
 interface IntroSectionProps {
   onOpenGame: () => void;
 }
 
-const IntroSection = ({ onOpenGame }: IntroSectionProps) => {
-  const floatingElements = [
-    { Icon: Star, className: "absolute top-20 left-10 text-tab-pink", animateY: [-10, 10, -10], animateRotate: [0, 10, 0], delay: 0 },
-    { Icon: Heart, className: "absolute top-40 right-20 text-tab-lavender", animateY: [10, -10, 10], animateRotate: [0, -10, 0], delay: 0.5 },
-    { Icon: Sparkles, className: "absolute bottom-32 left-20 text-tab-mint", animateY: [-5, 15, -5], delay: 1 },
-    { Icon: Cloud, className: "absolute top-32 right-1/3 text-tab-yellow", animateY: [5, -15, 5], animateX: [-5, 5, -5], delay: 1.5 },
-    { Icon: Flower, className: "absolute bottom-48 right-16 text-tab-peach", animateRotate: [0, 360], delay: 2 },
-    { Icon: Moon, className: "absolute top-1/2 left-8 text-tab-pink", animateY: [-8, 8, -8], animateScale: [1, 1.1, 1], delay: 0.8 },
-    { Icon: Candy, className: "absolute bottom-20 left-1/3 text-tab-lavender", animateY: [10, -5, 10], animateRotate: [-10, 10, -10], delay: 1.2 },
-    { Icon: Star, className: "absolute top-28 left-1/4 text-tab-mint", animateY: [-12, 8, -12], delay: 0.3, size: 5 },
-    { Icon: Heart, className: "absolute bottom-40 right-1/4 text-tab-yellow", animateScale: [1, 1.2, 1], animateRotate: [0, 180, 360], delay: 1.8 },
-  ];
+// Define responsive icon configurations
+const floatingIcons = [
+  { Icon: Star, color: "text-tab-pink", position: "top-16 left-8 md:top-20 md:left-16" },
+  { Icon: Heart, color: "text-tab-lavender", position: "top-24 right-12 md:top-32 md:right-24" },
+  { Icon: Cloud, color: "text-tab-mint", position: "hidden md:block md:bottom-40 md:left-20" },
+  { Icon: Snowflake, color: "text-tab-peach", position: "hidden md:block md:top-1/3 md:right-16" },
+  { Icon: Smile, color: "text-tab-yellow", position: "top-8 left-1/2 md:top-48 md:left-1/4" },
+  { Icon: Sparkles, color: "text-tab-pink", position: "hidden md:block md:bottom-32 md:right-1/3" },
+];
 
+const IntroSection = ({ onOpenGame }: IntroSectionProps) => {
   return (
     <section className="min-h-screen flex items-center justify-center px-4 py-12 relative overflow-hidden">
-      {/* Floating decorative elements - clickable to open game */}
-      {floatingElements.map(({ Icon, className, animateY, animateRotate, animateScale, delay }, index) => (
+      {/* Floating decorative elements - responsive positioning */}
+      {floatingIcons.map(({ Icon, color, position }, index) => (
         <motion.button
           key={index}
-          className={`${className} cursor-pointer hover:scale-125 transition-transform`}
+          className={`absolute ${position} ${color} cursor-pointer hover:scale-125 transition-transform z-20`}
           animate={{ 
-            y: animateY, 
-            rotate: animateRotate, 
-            scale: animateScale
+            y: [0, -12, 0],
+            rotate: [0, index % 2 === 0 ? 8 : -8, 0],
           }}
-          transition={{ duration: 4, repeat: Infinity, delay }}
+          transition={{ 
+            duration: 3 + index * 0.5, 
+            repeat: Infinity,
+            delay: index * 0.3,
+          }}
           onClick={onOpenGame}
-          whileHover={{ scale: 1.3 }}
+          whileHover={{ scale: 1.4 }}
           whileTap={{ scale: 0.9 }}
         >
-          <Icon className="w-8 h-8 fill-current" style={{ width: '32px', height: '32px' }} />
+          <Icon className="w-7 h-7 md:w-8 md:h-8 fill-current drop-shadow-md" />
         </motion.button>
       ))}
 
@@ -63,6 +64,22 @@ const IntroSection = ({ onOpenGame }: IntroSectionProps) => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
         >
+          {/* Paper clip decorations instead of tape */}
+          <motion.div 
+            className="absolute -top-6 left-12 text-muted-foreground"
+            animate={{ rotate: [-5, 5, -5] }}
+            transition={{ duration: 4, repeat: Infinity }}
+          >
+            <Paperclip className="w-10 h-10 transform rotate-45" />
+          </motion.div>
+          <motion.div 
+            className="absolute -top-5 right-16 text-tab-lavender"
+            animate={{ rotate: [5, -5, 5] }}
+            transition={{ duration: 3.5, repeat: Infinity }}
+          >
+            <Paperclip className="w-8 h-8 transform -rotate-12" />
+          </motion.div>
+
           <div className="flex flex-col md:flex-row items-center gap-8 md:gap-12">
             {/* Profile photo with decorative frame */}
             <motion.div 
@@ -80,7 +97,7 @@ const IntroSection = ({ onOpenGame }: IntroSectionProps) => {
                   className="w-full h-full object-cover object-top"
                 />
               </div>
-              {/* Cute corner decorations */}
+              {/* Cute corner decoration */}
               <div className="absolute -top-3 -right-3 bg-tab-yellow rounded-full p-2 shadow-md">
                 <Star className="w-4 h-4 text-foreground fill-current" />
               </div>
@@ -131,10 +148,6 @@ const IntroSection = ({ onOpenGame }: IntroSectionProps) => {
               </motion.div>
             </div>
           </div>
-
-          {/* Decorative tape strips */}
-          <div className="absolute -top-4 left-1/4 w-16 h-8 bg-tab-yellow/60 transform -rotate-12 rounded-sm" />
-          <div className="absolute -top-3 right-1/3 w-12 h-6 bg-tab-pink/60 transform rotate-6 rounded-sm" />
         </motion.div>
       </div>
 

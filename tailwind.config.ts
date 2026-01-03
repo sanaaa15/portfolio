@@ -14,7 +14,7 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['Quicksand', 'sans-serif'],
+        sans: ['Nunito', 'sans-serif'],
         display: ['Caveat', 'cursive'],
         heading: ['Schoolbell', 'cursive'],
       },
