@@ -7,344 +7,284 @@ import {
   Snowflake,
   Smile,
   Candy,
-  Sparkles,
-  Music,
-  Moon,
-  Cloud,
 } from "lucide-react";
 
 interface IntroSectionProps {
   onOpenGame: () => void;
 }
 
-/* ---------------------------------------
-   ICON CONFIG (no positions yet!)
----------------------------------------- */
-
-type IconZone = "top" | "bottom" | "left" | "right";
-
+// Icon definitions with deterministic "random" offsets for organic scrapbook feel
 const floatingIcons = [
-  // TOP
+  // Top zone icons
   {
     Icon: Star,
     color: "text-rose-400",
-    zone: "top",
-    placement: { x: "5%", y: "1%" },
-    offset: { x: -12, y: 10 },
-    float: 12,
+    position: { top: "-2rem", left: "8%" },
+    rotation: -12,
+    floatAmount: 8,
+    floatDuration: 4.2,
     filled: true,
+    showOn: "all", // all, md+, lg+
   },
   {
     Icon: Heart,
     color: "text-pink-400",
-    zone: "top",
-    placement: { x: "50%", y: "3%" },
-    offset: { x: 8, y: -6 },
-    float: 10,
+    position: { top: "-1.5rem", left: "45%" },
+    rotation: 8,
+    floatAmount: 10,
+    floatDuration: 3.8,
     filled: true,
+    showOn: "all",
+  },
+  {
+    Icon: Flower2,
+    color: "text-fuchsia-300",
+    position: { top: "-1rem", right: "12%" },
+    rotation: 15,
+    floatAmount: 6,
+    floatDuration: 4.5,
+    filled: false,
+    showOn: "md+",
+  },
+  
+  // Bottom zone icons
+  {
+    Icon: Candy,
+    color: "text-pink-300",
+    position: { bottom: "-2rem", left: "15%" },
+    rotation: -8,
+    floatAmount: 7,
+    floatDuration: 4.0,
+    filled: true,
+    showOn: "md+",
   },
   {
     Icon: Snowflake,
     color: "text-cyan-300",
-    zone: "top",
-    placement: { x: "80%", y: "15%" },
-    offset: { x: 0, y: 10 },
-    float: 14,
-    filled: true,
+    position: { bottom: "-1.5rem", right: "20%" },
+    rotation: 20,
+    floatAmount: 9,
+    floatDuration: 3.6,
+    filled: false,
+    showOn: "md+",
   },
-
-  // BOTTOM
+  
+  // Left side icons (large screens only)
   {
     Icon: Smile,
-    color: "text-yellow-400",
-    zone: "bottom",
-    placement: { x: "45%", y: "40%" },
-    offset: { x: -10, y: 6 },
-    float: 8,
+    color: "text-amber-400",
+    position: { top: "25%", left: "-3rem" },
+    rotation: -5,
+    floatAmount: 8,
+    floatDuration: 4.3,
     filled: false,
     strokeWidth: 2,
+    showOn: "lg+",
   },
   {
-    Icon: Music,
-    color: "text-purple-300",
-    zone: "bottom",
-    placement: { x: "58%", y: "20%" },
-    offset: { x: 12, y: -4 },
-    float: 10,
-    filled: false,
-    strokeWidth: 2,
+    Icon: Heart,
+    color: "text-rose-300",
+    position: { top: "60%", left: "-2.5rem" },
+    rotation: 12,
+    floatAmount: 6,
+    floatDuration: 3.9,
+    filled: true,
+    showOn: "lg+",
   },
-
-  // LEFT
+  
+  // Right side icons (large screens only)
   {
-    Icon: Flower2,
-    color: "text-pink-300",
-    zone: "left",
-    placement: { x: "40%", y: "30%" },
-    offset: { x: 0, y: -12 },
-    float: 14,
-    filled: false,
+    Icon: Star,
+    color: "text-amber-300",
+    position: { top: "20%", right: "-3rem" },
+    rotation: 18,
+    floatAmount: 10,
+    floatDuration: 4.1,
+    filled: true,
+    showOn: "lg+",
   },
   {
     Icon: Candy,
-    color: "text-fuchsia-300",
-    zone: "left",
-    placement: { x: "65%", y: "60%" },
-    offset: { x: -6, y: 8 },
-    float: 10,
+    color: "text-fuchsia-400",
+    position: { top: "55%", right: "-2.5rem" },
+    rotation: -15,
+    floatAmount: 7,
+    floatDuration: 3.7,
     filled: true,
-  },
-
-  // RIGHT
-  {
-    Icon: Sparkles,
-    color: "text-amber-300",
-    zone: "right",
-    placement: { x: "30%", y: "25%" },
-    offset: { x: 6, y: -10 },
-    float: 12,
-    filled: true,
+    showOn: "lg+",
   },
   {
-    Icon: Moon,
-    color: "text-indigo-300",
-    zone: "right",
-    placement: { x: "55%", y: "50%" },
-    offset: { x: -8, y: 6 },
-    float: 9,
-    filled: true,
-  },
-  {
-    Icon: Cloud,
-    color: "text-sky-300",
-    zone: "right",
-    placement: { x: "35%", y: "70%" },
-    offset: { x: 10, y: 10 },
-    float: 8,
+    Icon: Flower2,
+    color: "text-pink-400",
+    position: { bottom: "15%", right: "-2rem" },
+    rotation: 8,
+    floatAmount: 9,
+    floatDuration: 4.4,
     filled: false,
+    showOn: "lg+",
   },
 ];
 
+const getVisibilityClass = (showOn: string) => {
+  switch (showOn) {
+    case "md+":
+      return "hidden md:block";
+    case "lg+":
+      return "hidden lg:block";
+    default:
+      return "block";
+  }
+};
 
-/* ---------------------------------------
-   ICON RENDERER
----------------------------------------- */
+interface FloatingIconProps {
+  Icon: React.ComponentType<any>;
+  color: string;
+  position: Record<string, string>;
+  rotation: number;
+  floatAmount: number;
+  floatDuration: number;
+  filled: boolean;
+  strokeWidth?: number;
+  showOn: string;
+  onClick: () => void;
+}
 
 const FloatingIcon = ({
   Icon,
   color,
-  placement,
-  offset,
-  float,
+  position,
+  rotation,
+  floatAmount,
+  floatDuration,
   filled,
-  strokeWidth,
+  strokeWidth = 1.75,
+  showOn,
   onClick,
-}: any) => (
+}: FloatingIconProps) => (
   <motion.button
     onClick={onClick}
-    className={`absolute ${color} cursor-pointer`}
-    style={{
-      left: placement.x,
-      top: placement.y,
-      transform: `translate(${offset.x}px, ${offset.y}px)`,
-    }}
+    className={`absolute ${color} cursor-pointer pointer-events-auto ${getVisibilityClass(showOn)}`}
+    style={position}
+    initial={{ rotate: rotation }}
     animate={{
-      y: [0, -float, 0],
-      rotate: [-6, 8, -6],
+      y: [0, -floatAmount, 0],
+      rotate: [rotation - 4, rotation + 4, rotation - 4],
     }}
     transition={{
-      duration: 3 + float * 0.12,
+      duration: floatDuration,
       repeat: Infinity,
       ease: "easeInOut",
     }}
-    whileHover={{ scale: 1.35, rotate: 0 }}
+    whileHover={{ scale: 1.3, rotate: 0 }}
     whileTap={{ scale: 0.9 }}
   >
     <Icon
-      className="w-8 h-8 md:w-10 md:h-10 drop-shadow-lg"
+      className="w-7 h-7 md:w-9 md:h-9 drop-shadow-md"
       fill={filled ? "currentColor" : "none"}
       stroke={filled ? "none" : "currentColor"}
-      strokeWidth={strokeWidth ?? 1.75}
+      strokeWidth={strokeWidth}
     />
   </motion.button>
 );
 
-/* ---------------------------------------
-   ICON ZONES (KEY RESPONSIVE LOGIC)
----------------------------------------- */
-
-const FloatingIcons = ({ onOpenGame }: { onOpenGame: () => void }) => {
-  return (
-    <>
-      {/* TOP ICONS */}
-      <div
-        className="
-          absolute left-0 right-0
-          -top-24 sm:-top-18 md:-top-14
-          h-24
-          pointer-events-none
-        "
-      >
-        {floatingIcons
-          .filter((i) => i.zone === "top")
-          .slice(0, 3)
-          .map((icon, i) => (
-            <FloatingIcon
-              key={i}
-              {...icon}
-              onClick={onOpenGame}
-            />
-          ))}
-      </div>
-
-
-      {/* BOTTOM ICONS */}
-      <div
-        className="
-          absolute left-0 right-0
-          -bottom-24 hidden sm:block
-          h-24
-          pointer-events-none
-        "
-      >
-        {floatingIcons
-          .filter((i) => i.zone === "bottom")
-          .map((icon, i) => (
-            <FloatingIcon
-              key={i}
-              {...icon}
-              onClick={onOpenGame}
-            />
-          ))}
-      </div>
-
-
-      {/* LEFT SIDE & RIGHT SIDE (DESKTOP+) */}
-      <div
-        className="
-          absolute top-1/2 -translate-y-1/2
-          -left-28 hidden lg:block
-          h-64 w-20
-        "
-      >
-        {floatingIcons
-          .filter((i) => i.zone === "left")
-          .map((icon, i) => (
-            <FloatingIcon key={i} {...icon} onClick={onOpenGame} />
-          ))}
-      </div>
-
-      <div
-        className="
-          absolute top-1/2 -translate-y-1/2
-          -right-28 hidden lg:block
-          h-64 w-20
-        "
-      >
-        {floatingIcons
-          .filter((i) => i.zone === "right")
-          .map((icon, i) => (
-            <FloatingIcon key={i} {...icon} onClick={onOpenGame} />
-          ))}
-      </div>
-    </>
-  );
-};
-
-/* ---------------------------------------
-   MAIN COMPONENT
----------------------------------------- */
-
 const IntroSection = ({ onOpenGame }: IntroSectionProps) => {
   return (
-    <section className="min-h-screen flex items-center justify-center px-4 py-16 overflow-hidden">
-      {/* RELATIVE WRAPPER = anchor for icons */}
-      <div className="relative w-full max-w-5xl">
-        <FloatingIcons onOpenGame={onOpenGame} />
+    <section className="min-h-screen flex items-center justify-center px-4 py-12 md:py-16 overflow-visible">
+      {/* RELATIVE WRAPPER = anchor for all icons */}
+      <div className="relative w-full max-w-4xl mx-auto">
+        {/* Floating sticker icons - positioned relative to this wrapper */}
+        <div className="absolute inset-0 pointer-events-none" style={{ margin: "-3rem" }}>
+          {floatingIcons.map((icon, i) => (
+            <FloatingIcon key={i} {...icon} onClick={onOpenGame} />
+          ))}
+        </div>
 
-        {/* Paper stack */}
+        {/* Paper stack background layers */}
         <motion.div
-          className="absolute inset-0 bg-paper-lavender rounded-3xl rotate-3 paper-texture"
+          className="absolute inset-0 bg-paper-lavender rounded-2xl rotate-2 paper-texture"
           initial={{ scale: 0.95 }}
         />
         <motion.div
-          className="absolute inset-0 bg-paper-mint rounded-3xl -rotate-2 paper-texture"
+          className="absolute inset-0 bg-paper-mint rounded-2xl -rotate-1 paper-texture"
           initial={{ scale: 0.97 }}
         />
 
         {/* Main Card */}
         <motion.div
-          className="relative bg-paper-cream rounded-3xl p-8 md:p-12 paper-texture shadow-paper-lg"
-          initial={{ opacity: 0, y: 40 }}
+          className="relative bg-paper-cream rounded-2xl p-6 md:p-10 paper-texture shadow-paper-lg"
+          initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
+          transition={{ duration: 0.7 }}
         >
-          <div className="flex flex-col md:flex-row items-center gap-8 md:gap-12">
-             {/* Profile photo with decorative frame */}
-            <motion.div 
+          <div className="flex flex-col md:flex-row items-center gap-6 md:gap-10">
+            {/* Profile photo with decorative frame */}
+            <motion.div
               className="relative"
-              whileHover={{ scale: 1.05, rotate: 2 }}
+              whileHover={{ scale: 1.03, rotate: 1 }}
               transition={{ type: "spring", stiffness: 300 }}
             >
               {/* Photo frame layers */}
-              <div className="absolute inset-0 bg-tab-pink rounded-2xl transform rotate-3 translate-x-2 translate-y-2" />
-              <div className="absolute inset-0 bg-tab-lavender rounded-2xl transform -rotate-2 translate-x-1 translate-y-1" />
-              <div className="relative w-48 h-48 md:w-64 md:h-64 rounded-2xl overflow-hidden border-4 border-paper-cream shadow-lg">
-                <img 
-                  src={profilePhoto} 
-                  alt="Profile photo" 
+              <div className="absolute inset-0 bg-tab-pink rounded-xl transform rotate-2 translate-x-1.5 translate-y-1.5" />
+              <div className="absolute inset-0 bg-tab-lavender rounded-xl transform -rotate-1 translate-x-0.5 translate-y-0.5" />
+              <div className="relative w-40 h-40 md:w-56 md:h-56 rounded-xl overflow-hidden border-4 border-paper-cream shadow-lg">
+                <img
+                  src={profilePhoto}
+                  alt="Profile photo"
                   className="w-full h-full object-cover object-top"
                 />
               </div>
-              {/* Cute corner decoration */}
-              <div className="absolute -top-3 -right-3 bg-tab-yellow rounded-full p-2 shadow-md">
-                <Star className="w-4 h-4 text-foreground fill-current" />
+              {/* Corner star decoration */}
+              <div className="absolute -top-2 -right-2 bg-tab-yellow rounded-full p-1.5 shadow-md">
+                <Star className="w-3 h-3 text-foreground fill-current" />
               </div>
             </motion.div>
 
             {/* Text content */}
             <div className="text-center md:text-left flex-1">
               <motion.div
-                initial={{ opacity: 0, x: 20 }}
+                initial={{ opacity: 0, x: 15 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.4 }}
+                transition={{ delay: 0.3 }}
               >
-                <p className="text-muted-foreground font-medium mb-2">Hello, I'm</p>
-                <h1 className="text-5xl md:text-7xl font-heading font-bold text-foreground mb-4">
+                <p className="text-muted-foreground font-medium mb-1">Hello, I'm</p>
+                <h1 className="text-4xl md:text-6xl font-heading font-bold text-foreground mb-3">
                   Sana Suman
                 </h1>
-                <div className="inline-block bg-primary/30 px-4 py-2 rounded-full mb-4">
-                  <p className="text-lg font-semibold text-primary-foreground">
+                <div className="inline-block bg-primary/30 px-3 py-1.5 rounded-full mb-3">
+                  <p className="text-base font-semibold text-primary-foreground">
                     Software Engineer @ G2
                   </p>
                 </div>
-                <p className="text-muted-foreground text-lg mb-6 max-w-md">
+                <p className="text-muted-foreground text-base mb-5 max-w-md">
                   Based in Bangalore, India 🇮🇳
                   <br />
                   Building beautiful things with code ✨
                 </p>
-                
-                {/* Cute tags */}
+
+                {/* Tags */}
                 <div className="flex flex-wrap gap-2 justify-center md:justify-start">
                   {["AI/ML", "Full-Stack", "Research", "UI/UX"].map((tag, i) => (
                     <motion.span
                       key={tag}
-                      className={`px-3 py-1 rounded-full text-sm font-medium ${
-                        i === 0 ? "bg-tab-pink text-foreground" :
-                        i === 1 ? "bg-tab-lavender text-foreground" :
-                        i === 2 ? "bg-tab-mint text-foreground" :
-                        "bg-tab-peach text-foreground"
+                      className={`px-2.5 py-1 rounded-full text-sm font-medium ${
+                        i === 0
+                          ? "bg-tab-pink text-foreground"
+                          : i === 1
+                          ? "bg-tab-lavender text-foreground"
+                          : i === 2
+                          ? "bg-tab-mint text-foreground"
+                          : "bg-tab-peach text-foreground"
                       }`}
                       initial={{ opacity: 0, scale: 0.8 }}
                       animate={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: 0.5 + i * 0.1 }}
-                      whileHover={{ scale: 1.1 }}
+                      transition={{ delay: 0.4 + i * 0.08 }}
+                      whileHover={{ scale: 1.08 }}
                     >
                       {tag}
                     </motion.span>
                   ))}
-              </div>
-             </motion.div>
+                </div>
+              </motion.div>
             </div>
           </div>
         </motion.div>
