@@ -102,9 +102,6 @@
   body {
     @apply bg-background text-foreground font-sans;
     font-family: 'Nunito', sans-serif;
-    background-image: url('/paper-texture.png');
-    background-repeat: repeat;
-    background-size: auto;
   }
 
   h1, h2 {
