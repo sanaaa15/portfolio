@@ -1,87 +1,286 @@
 import { motion } from "framer-motion";
 import profilePhoto from "@/assets/profile-photo.png";
-import { Paperclip, Star, Heart, Cloud, Snowflake, Smile, Sparkles } from "lucide-react";
+import {
+  Star,
+  Heart,
+  Flower2,
+  Snowflake,
+  Smile,
+  Candy,
+  Sparkles,
+  Music,
+  Moon,
+  Cloud,
+} from "lucide-react";
 
 interface IntroSectionProps {
   onOpenGame: () => void;
 }
 
-// Define responsive icon configurations
+/* ---------------------------------------
+   ICON CONFIG (no positions yet!)
+---------------------------------------- */
+
+type IconZone = "top" | "bottom" | "left" | "right";
+
 const floatingIcons = [
-  { Icon: Star, color: "text-tab-pink", position: "top-16 left-8 md:top-20 md:left-16" },
-  { Icon: Heart, color: "text-tab-lavender", position: "top-24 right-12 md:top-32 md:right-24" },
-  { Icon: Cloud, color: "text-tab-mint", position: "hidden md:block md:bottom-40 md:left-20" },
-  { Icon: Snowflake, color: "text-tab-peach", position: "hidden md:block md:top-1/3 md:right-16" },
-  { Icon: Smile, color: "text-tab-yellow", position: "top-8 left-1/2 md:top-48 md:left-1/4" },
-  { Icon: Sparkles, color: "text-tab-pink", position: "hidden md:block md:bottom-32 md:right-1/3" },
+  // TOP
+  {
+    Icon: Star,
+    color: "text-rose-400",
+    zone: "top",
+    placement: { x: "5%", y: "1%" },
+    offset: { x: -12, y: 10 },
+    float: 12,
+    filled: true,
+  },
+  {
+    Icon: Heart,
+    color: "text-pink-400",
+    zone: "top",
+    placement: { x: "50%", y: "3%" },
+    offset: { x: 8, y: -6 },
+    float: 10,
+    filled: true,
+  },
+  {
+    Icon: Snowflake,
+    color: "text-cyan-300",
+    zone: "top",
+    placement: { x: "80%", y: "15%" },
+    offset: { x: 0, y: 10 },
+    float: 14,
+    filled: true,
+  },
+
+  // BOTTOM
+  {
+    Icon: Smile,
+    color: "text-yellow-400",
+    zone: "bottom",
+    placement: { x: "45%", y: "40%" },
+    offset: { x: -10, y: 6 },
+    float: 8,
+    filled: false,
+    strokeWidth: 2,
+  },
+  {
+    Icon: Music,
+    color: "text-purple-300",
+    zone: "bottom",
+    placement: { x: "58%", y: "20%" },
+    offset: { x: 12, y: -4 },
+    float: 10,
+    filled: false,
+    strokeWidth: 2,
+  },
+
+  // LEFT
+  {
+    Icon: Flower2,
+    color: "text-pink-300",
+    zone: "left",
+    placement: { x: "40%", y: "30%" },
+    offset: { x: 0, y: -12 },
+    float: 14,
+    filled: false,
+  },
+  {
+    Icon: Candy,
+    color: "text-fuchsia-300",
+    zone: "left",
+    placement: { x: "65%", y: "60%" },
+    offset: { x: -6, y: 8 },
+    float: 10,
+    filled: true,
+  },
+
+  // RIGHT
+  {
+    Icon: Sparkles,
+    color: "text-amber-300",
+    zone: "right",
+    placement: { x: "30%", y: "25%" },
+    offset: { x: 6, y: -10 },
+    float: 12,
+    filled: true,
+  },
+  {
+    Icon: Moon,
+    color: "text-indigo-300",
+    zone: "right",
+    placement: { x: "55%", y: "50%" },
+    offset: { x: -8, y: 6 },
+    float: 9,
+    filled: true,
+  },
+  {
+    Icon: Cloud,
+    color: "text-sky-300",
+    zone: "right",
+    placement: { x: "35%", y: "70%" },
+    offset: { x: 10, y: 10 },
+    float: 8,
+    filled: false,
+  },
 ];
+
+
+/* ---------------------------------------
+   ICON RENDERER
+---------------------------------------- */
+
+const FloatingIcon = ({
+  Icon,
+  color,
+  placement,
+  offset,
+  float,
+  filled,
+  strokeWidth,
+  onClick,
+}: any) => (
+  <motion.button
+    onClick={onClick}
+    className={`absolute ${color} cursor-pointer`}
+    style={{
+      left: placement.x,
+      top: placement.y,
+      transform: `translate(${offset.x}px, ${offset.y}px)`,
+    }}
+    animate={{
+      y: [0, -float, 0],
+      rotate: [-6, 8, -6],
+    }}
+    transition={{
+      duration: 3 + float * 0.12,
+      repeat: Infinity,
+      ease: "easeInOut",
+    }}
+    whileHover={{ scale: 1.35, rotate: 0 }}
+    whileTap={{ scale: 0.9 }}
+  >
+    <Icon
+      className="w-8 h-8 md:w-10 md:h-10 drop-shadow-lg"
+      fill={filled ? "currentColor" : "none"}
+      stroke={filled ? "none" : "currentColor"}
+      strokeWidth={strokeWidth ?? 1.75}
+    />
+  </motion.button>
+);
+
+/* ---------------------------------------
+   ICON ZONES (KEY RESPONSIVE LOGIC)
+---------------------------------------- */
+
+const FloatingIcons = ({ onOpenGame }: { onOpenGame: () => void }) => {
+  return (
+    <>
+      {/* TOP ICONS */}
+      <div
+        className="
+          absolute left-0 right-0
+          -top-24 sm:-top-18 md:-top-14
+          h-24
+          pointer-events-none
+        "
+      >
+        {floatingIcons
+          .filter((i) => i.zone === "top")
+          .slice(0, 3)
+          .map((icon, i) => (
+            <FloatingIcon
+              key={i}
+              {...icon}
+              onClick={onOpenGame}
+            />
+          ))}
+      </div>
+
+
+      {/* BOTTOM ICONS */}
+      <div
+        className="
+          absolute left-0 right-0
+          -bottom-24 hidden sm:block
+          h-24
+          pointer-events-none
+        "
+      >
+        {floatingIcons
+          .filter((i) => i.zone === "bottom")
+          .map((icon, i) => (
+            <FloatingIcon
+              key={i}
+              {...icon}
+              onClick={onOpenGame}
+            />
+          ))}
+      </div>
+
+
+      {/* LEFT SIDE & RIGHT SIDE (DESKTOP+) */}
+      <div
+        className="
+          absolute top-1/2 -translate-y-1/2
+          -left-28 hidden lg:block
+          h-64 w-20
+        "
+      >
+        {floatingIcons
+          .filter((i) => i.zone === "left")
+          .map((icon, i) => (
+            <FloatingIcon key={i} {...icon} onClick={onOpenGame} />
+          ))}
+      </div>
+
+      <div
+        className="
+          absolute top-1/2 -translate-y-1/2
+          -right-28 hidden lg:block
+          h-64 w-20
+        "
+      >
+        {floatingIcons
+          .filter((i) => i.zone === "right")
+          .map((icon, i) => (
+            <FloatingIcon key={i} {...icon} onClick={onOpenGame} />
+          ))}
+      </div>
+    </>
+  );
+};
+
+/* ---------------------------------------
+   MAIN COMPONENT
+---------------------------------------- */
 
 const IntroSection = ({ onOpenGame }: IntroSectionProps) => {
   return (
-    <section className="min-h-screen flex items-center justify-center px-4 py-12 relative overflow-hidden">
-      {/* Floating decorative elements - responsive positioning */}
-      {floatingIcons.map(({ Icon, color, position }, index) => (
-        <motion.button
-          key={index}
-          className={`absolute ${position} ${color} cursor-pointer hover:scale-125 transition-transform z-20`}
-          animate={{ 
-            y: [0, -12, 0],
-            rotate: [0, index % 2 === 0 ? 8 : -8, 0],
-          }}
-          transition={{ 
-            duration: 3 + index * 0.5, 
-            repeat: Infinity,
-            delay: index * 0.3,
-          }}
-          onClick={onOpenGame}
-          whileHover={{ scale: 1.4 }}
-          whileTap={{ scale: 0.9 }}
-        >
-          <Icon className="w-7 h-7 md:w-8 md:h-8 fill-current drop-shadow-md" />
-        </motion.button>
-      ))}
+    <section className="min-h-screen flex items-center justify-center px-4 py-16 overflow-hidden">
+      {/* RELATIVE WRAPPER = anchor for icons */}
+      <div className="relative w-full max-w-5xl">
+        <FloatingIcons onOpenGame={onOpenGame} />
 
-      {/* Main content - stacked paper effect */}
-      <div className="relative max-w-4xl mx-auto">
-        {/* Background papers */}
-        <motion.div 
-          className="absolute inset-0 bg-paper-lavender rounded-3xl transform rotate-3 paper-texture"
-          initial={{ rotate: 6, scale: 0.95 }}
-          animate={{ rotate: 3 }}
-          transition={{ duration: 0.8 }}
+        {/* Paper stack */}
+        <motion.div
+          className="absolute inset-0 bg-paper-lavender rounded-3xl rotate-3 paper-texture"
+          initial={{ scale: 0.95 }}
         />
-        <motion.div 
-          className="absolute inset-0 bg-paper-mint rounded-3xl transform -rotate-2 paper-texture"
-          initial={{ rotate: -4, scale: 0.97 }}
-          animate={{ rotate: -2 }}
-          transition={{ duration: 0.8, delay: 0.1 }}
+        <motion.div
+          className="absolute inset-0 bg-paper-mint rounded-3xl -rotate-2 paper-texture"
+          initial={{ scale: 0.97 }}
         />
-        
-        {/* Main card */}
-        <motion.div 
+
+        {/* Main Card */}
+        <motion.div
           className="relative bg-paper-cream rounded-3xl p-8 md:p-12 paper-texture shadow-paper-lg"
-          initial={{ opacity: 0, y: 50 }}
+          initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
+          transition={{ duration: 0.8 }}
         >
-          {/* Paper clip decorations instead of tape */}
-          <motion.div 
-            className="absolute -top-6 left-12 text-muted-foreground"
-            animate={{ rotate: [-5, 5, -5] }}
-            transition={{ duration: 4, repeat: Infinity }}
-          >
-            <Paperclip className="w-10 h-10 transform rotate-45" />
-          </motion.div>
-          <motion.div 
-            className="absolute -top-5 right-16 text-tab-lavender"
-            animate={{ rotate: [5, -5, 5] }}
-            transition={{ duration: 3.5, repeat: Infinity }}
-          >
-            <Paperclip className="w-8 h-8 transform -rotate-12" />
-          </motion.div>
-
           <div className="flex flex-col md:flex-row items-center gap-8 md:gap-12">
-            {/* Profile photo with decorative frame */}
+             {/* Profile photo with decorative frame */}
             <motion.div 
               className="relative"
               whileHover={{ scale: 1.05, rotate: 2 }}
@@ -144,38 +343,12 @@ const IntroSection = ({ onOpenGame }: IntroSectionProps) => {
                       {tag}
                     </motion.span>
                   ))}
-                </div>
-              </motion.div>
+              </div>
+             </motion.div>
             </div>
           </div>
         </motion.div>
       </div>
-
-      {/* Scroll indicator - centered */}
-      <motion.div 
-        className="absolute bottom-8 left-0 right-0 flex flex-col items-center gap-2"
-        animate={{ y: [0, 10, 0] }}
-        transition={{ duration: 2, repeat: Infinity }}
-      >
-        <span className="text-muted-foreground text-sm font-medium">Scroll to explore</span>
-        <div className="w-6 h-10 border-2 border-primary rounded-full flex justify-center pt-2">
-          <motion.div 
-            className="w-2 h-2 bg-primary rounded-full"
-            animate={{ y: [0, 12, 0] }}
-            transition={{ duration: 1.5, repeat: Infinity }}
-          />
-        </div>
-      </motion.div>
-
-      {/* Hint for hidden game */}
-      <motion.p
-        className="absolute bottom-2 left-0 right-0 text-center text-muted-foreground/50 text-xs"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 3 }}
-      >
-        ✨ Click a floating icon to play a game ✨
-      </motion.p>
     </section>
   );
 };

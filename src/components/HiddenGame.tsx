@@ -1,136 +1,117 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useCallback, forwardRef, useImperativeHandle } from "react";
-import { Star, X, Trophy, Heart, Sparkles, Zap, Target } from "lucide-react";
-
-interface LeaderboardEntry {
-  name: string;
-  score: number;
-  date: string;
-}
-
-interface FallingItem {
-  id: number;
-  x: number;
-  type: "star" | "heart" | "sparkle" | "bomb";
-  speed: number;
-}
+import { Star, X, Trophy } from "lucide-react";
+import { FirebaseLeaderboardService, type LeaderboardEntry } from "@/lib/leaderboard";
 
 export interface HiddenGameRef {
   openGame: () => void;
 }
 
-const LEADERBOARD_KEY = "starCatcher_leaderboard";
-
-const getLeaderboard = (): LeaderboardEntry[] => {
-  try {
-    const stored = localStorage.getItem(LEADERBOARD_KEY);
-    return stored ? JSON.parse(stored) : [];
-  } catch {
-    return [];
-  }
-};
-
-const saveLeaderboard = (entries: LeaderboardEntry[]) => {
-  try {
-    localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(entries));
-  } catch {
-    console.error("Error saving leaderboard");
-  }
-};
+const DEFAULT_LEADERBOARD: LeaderboardEntry[] = [
+  { name: "Sana ⭐", score: 42, date: "2024-01-01" },
+  { name: "Cutie Pie", score: 38, date: "2024-01-02" },
+  { name: "Star Player", score: 35, date: "2024-01-03" },
+  { name: "Lucky Duck", score: 30, date: "2024-01-04" },
+  { name: "Sparkle", score: 25, date: "2024-01-05" },
+];
 
 const HiddenGame = forwardRef<HiddenGameRef>((_, ref) => {
   const [isOpen, setIsOpen] = useState(false);
   const [score, setScore] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(15);
+  const [timeLeft, setTimeLeft] = useState(10);
   const [isPlaying, setIsPlaying] = useState(false);
   const [gameOver, setGameOver] = useState(false);
   const [playerName, setPlayerName] = useState("");
-  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
+  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>(DEFAULT_LEADERBOARD);
+  const [starPosition, setStarPosition] = useState({ x: 50, y: 50 });
   const [showNameInput, setShowNameInput] = useState(false);
-  const [fallingItems, setFallingItems] = useState<FallingItem[]>([]);
-  const [combo, setCombo] = useState(0);
-  const [lives, setLives] = useState(3);
-  const [showCombo, setShowCombo] = useState(false);
-
-  useEffect(() => {
-    setLeaderboard(getLeaderboard());
-  }, []);
+  const [isLoadingLeaderboard, setIsLoadingLeaderboard] = useState(false);
+  const [isSavingScore, setIsSavingScore] = useState(false);
 
   useImperativeHandle(ref, () => ({
     openGame: () => setIsOpen(true),
   }));
 
-  const spawnItem = useCallback(() => {
-    const types: FallingItem["type"][] = ["star", "star", "heart", "sparkle", "bomb"];
-    const type = types[Math.floor(Math.random() * types.length)];
-    
-    const newItem: FallingItem = {
-      id: Date.now() + Math.random(),
+  // Load leaderboard from Firebase when modal opens
+  useEffect(() => {
+    if (isOpen && !isLoadingLeaderboard) {
+      loadLeaderboard();
+    }
+  }, [isOpen]);
+
+  const loadLeaderboard = async () => {
+    setIsLoadingLeaderboard(true);
+    try {
+      const scores = await FirebaseLeaderboardService.getTopScores(5);
+      if (scores.length > 0) {
+        setLeaderboard(scores);
+      } else {
+        setLeaderboard(DEFAULT_LEADERBOARD);
+      }
+    } catch (error) {
+      console.error('Failed to load leaderboard, using defaults:', error);
+      setLeaderboard(DEFAULT_LEADERBOARD);
+    } finally {
+      setIsLoadingLeaderboard(false);
+    }
+  };
+
+  const moveStarRandomly = useCallback(() => {
+    setStarPosition({
       x: Math.random() * 80 + 10,
-      type,
-      speed: 2 + Math.random() * 2,
-    };
-    
-    setFallingItems(prev => [...prev, newItem]);
+      y: Math.random() * 70 + 15,
+    });
   }, []);
 
-  const handleCatch = (item: FallingItem) => {
+  const handleStarClick = () => {
     if (!isPlaying) return;
-    
-    setFallingItems(prev => prev.filter(i => i.id !== item.id));
-    
-    if (item.type === "bomb") {
-      setLives(prev => {
-        const newLives = prev - 1;
-        if (newLives <= 0) {
-          setIsPlaying(false);
-          setGameOver(true);
-          setShowNameInput(true);
-        }
-        return newLives;
-      });
-      setCombo(0);
-    } else {
-      const points = item.type === "star" ? 10 : item.type === "heart" ? 25 : 15;
-      const comboMultiplier = Math.min(combo + 1, 5);
-      setScore(prev => prev + points * comboMultiplier);
-      setCombo(prev => Math.min(prev + 1, 5));
-      setShowCombo(true);
-      setTimeout(() => setShowCombo(false), 300);
-    }
+    setScore((prev) => prev + 1);
+    moveStarRandomly();
   };
 
   const startGame = () => {
     setScore(0);
-    setTimeLeft(15);
+    setTimeLeft(10);
     setIsPlaying(true);
     setGameOver(false);
     setShowNameInput(false);
-    setFallingItems([]);
-    setCombo(0);
-    setLives(3);
+    moveStarRandomly();
   };
 
-  const handleSubmitScore = () => {
-    if (!playerName.trim()) return;
+  const handleSubmitScore = async () => {
+    if (!playerName.trim() || isSavingScore) return;
     
-    const newEntry: LeaderboardEntry = {
-      name: playerName,
-      score: score,
-      date: new Date().toISOString().split("T")[0],
-    };
+    setIsSavingScore(true);
+    try {
+      // Save to Firebase
+      await FirebaseLeaderboardService.addScore(playerName, score);
+      
+      // Reload leaderboard
+      await loadLeaderboard();
+      
+      setShowNameInput(false);
+      setPlayerName("");
+    } catch (error) {
+      console.error('Failed to save score:', error);
+      // Fallback to local update if Firebase fails
+      const newEntry: LeaderboardEntry = {
+        name: playerName,
+        score: score,
+        date: new Date().toISOString().split("T")[0],
+      };
 
-    const updatedLeaderboard = [...leaderboard, newEntry]
-      .sort((a, b) => b.score - a.score)
-      .slice(0, 10);
+      const updatedLeaderboard = [...leaderboard, newEntry]
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 5);
 
-    setLeaderboard(updatedLeaderboard);
-    saveLeaderboard(updatedLeaderboard);
-    setShowNameInput(false);
-    setPlayerName("");
+      setLeaderboard(updatedLeaderboard);
+      setShowNameInput(false);
+      setPlayerName("");
+    } finally {
+      setIsSavingScore(false);
+    }
   };
 
-  // Game timer
   useEffect(() => {
     if (!isPlaying || timeLeft <= 0) return;
 
@@ -148,51 +129,6 @@ const HiddenGame = forwardRef<HiddenGameRef>((_, ref) => {
 
     return () => clearInterval(timer);
   }, [isPlaying, timeLeft]);
-
-  // Spawn items
-  useEffect(() => {
-    if (!isPlaying) return;
-    
-    const spawnInterval = setInterval(() => {
-      spawnItem();
-    }, 600);
-
-    return () => clearInterval(spawnInterval);
-  }, [isPlaying, spawnItem]);
-
-  // Move items down and remove off-screen ones
-  useEffect(() => {
-    if (!isPlaying) return;
-
-    const moveInterval = setInterval(() => {
-      setFallingItems(prev => 
-        prev.map(item => ({ ...item, y: (item as any).y || 0 }))
-          .filter(item => (item as any).y < 100)
-      );
-    }, 50);
-
-    return () => clearInterval(moveInterval);
-  }, [isPlaying]);
-
-  // Decay combo
-  useEffect(() => {
-    if (!isPlaying || combo === 0) return;
-    
-    const comboDecay = setTimeout(() => {
-      setCombo(prev => Math.max(0, prev - 1));
-    }, 2000);
-
-    return () => clearTimeout(comboDecay);
-  }, [isPlaying, combo, score]);
-
-  const getItemIcon = (type: FallingItem["type"]) => {
-    switch (type) {
-      case "star": return <Star className="w-8 h-8 text-amber-400 fill-current" />;
-      case "heart": return <Heart className="w-8 h-8 text-rose-400 fill-current" />;
-      case "sparkle": return <Sparkles className="w-8 h-8 text-violet-400 fill-current" />;
-      case "bomb": return <Zap className="w-8 h-8 text-slate-600" />;
-    }
-  };
 
   return (
     <AnimatePresence>
@@ -224,17 +160,9 @@ const HiddenGame = forwardRef<HiddenGameRef>((_, ref) => {
 
             {!isPlaying && !gameOver && (
               <div className="text-center space-y-4">
-                <div className="bg-white/60 rounded-xl p-4 space-y-2">
-                  <p className="text-foreground font-medium">How to Play:</p>
-                  <div className="flex justify-center gap-4 text-sm">
-                    <span className="flex items-center gap-1"><Star className="w-4 h-4 text-amber-400 fill-current" /> +10</span>
-                    <span className="flex items-center gap-1"><Sparkles className="w-4 h-4 text-violet-400 fill-current" /> +15</span>
-                    <span className="flex items-center gap-1"><Heart className="w-4 h-4 text-rose-400 fill-current" /> +25</span>
-                  </div>
-                  <p className="text-rose-500 text-sm flex items-center justify-center gap-1">
-                    <Zap className="w-4 h-4" /> Avoid the lightning! You have 3 lives.
-                  </p>
-                  <p className="text-violet-600 text-sm">Build combos for bonus points! (up to 5x)</p>
+                <div className="bg-white/60 rounded-xl p-4">
+                  <p className="text-foreground font-medium mb-2">Click the star as many times as you can!</p>
+                  <p className="text-muted-foreground text-sm">You have 10 seconds ⏱️</p>
                 </div>
                 <motion.button
                   onClick={startGame}
@@ -242,79 +170,35 @@ const HiddenGame = forwardRef<HiddenGameRef>((_, ref) => {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  <Target className="w-5 h-5 inline mr-2" />
-                  Play Now!
+                  Start Game!
                 </motion.button>
               </div>
             )}
 
             {isPlaying && (
               <div className="space-y-4">
-                {/* Game stats */}
                 <div className="flex justify-between items-center">
                   <div className="flex items-center gap-2 px-4 py-2 bg-white/80 rounded-full shadow-sm">
                     <Star className="w-5 h-5 text-amber-400 fill-current" />
                     <span className="font-bold text-foreground">{score}</span>
                   </div>
-                  
-                  <AnimatePresence>
-                    {showCombo && combo > 1 && (
-                      <motion.div
-                        initial={{ scale: 0, y: 20 }}
-                        animate={{ scale: 1, y: 0 }}
-                        exit={{ scale: 0, y: -20 }}
-                        className="px-3 py-1 bg-gradient-to-r from-amber-400 to-rose-400 text-white rounded-full font-bold"
-                      >
-                        {combo}x COMBO!
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                  
-                  <div className="flex items-center gap-2">
-                    <div className="flex gap-1">
-                      {[...Array(3)].map((_, i) => (
-                        <Heart 
-                          key={i} 
-                          className={`w-5 h-5 ${i < lives ? 'text-rose-400 fill-current' : 'text-slate-300'}`} 
-                        />
-                      ))}
-                    </div>
-                    <div className="px-4 py-2 bg-white/80 rounded-full shadow-sm">
-                      <span className="font-bold text-foreground">{timeLeft}s</span>
-                    </div>
+                  <div className="px-4 py-2 bg-white/80 rounded-full shadow-sm">
+                    <span className="font-bold text-foreground">{timeLeft}s</span>
                   </div>
                 </div>
 
-                {/* Game area */}
                 <div className="relative h-72 bg-gradient-to-b from-sky-200/50 to-violet-200/50 rounded-2xl overflow-hidden border-2 border-white/50">
-                  {fallingItems.map((item) => (
-                    <motion.button
-                      key={item.id}
-                      className="absolute p-2"
-                      style={{ left: `${item.x}%` }}
-                      initial={{ top: "-10%", rotate: 0 }}
-                      animate={{ 
-                        top: "110%",
-                        rotate: item.type === "bomb" ? [0, 360] : [0, 20, -20, 0],
-                      }}
-                      transition={{ 
-                        top: { duration: item.speed, ease: "linear" },
-                        rotate: { duration: 1, repeat: Infinity },
-                      }}
-                      onClick={() => handleCatch(item)}
-                      whileHover={{ scale: 1.2 }}
-                      whileTap={{ scale: 0.8 }}
-                    >
-                      {getItemIcon(item.type)}
-                    </motion.button>
-                  ))}
-                  
-                  {/* Combo indicator */}
-                  {combo > 0 && (
-                    <div className="absolute bottom-2 left-2 px-2 py-1 bg-white/80 rounded-lg text-xs font-bold text-violet-600">
-                      Combo: {combo}x
-                    </div>
-                  )}
+                  <motion.button
+                    className="absolute transform -translate-x-1/2 -translate-y-1/2"
+                    style={{ left: `${starPosition.x}%`, top: `${starPosition.y}%` }}
+                    onClick={handleStarClick}
+                    whileHover={{ scale: 1.3 }}
+                    whileTap={{ scale: 0.8 }}
+                    animate={{ rotate: [0, 20, -20, 0] }}
+                    transition={{ rotate: { duration: 1, repeat: Infinity } }}
+                  >
+                    <Star className="w-12 h-12 text-amber-400 fill-current drop-shadow-lg" />
+                  </motion.button>
                 </div>
               </div>
             )}
@@ -330,10 +214,10 @@ const HiddenGame = forwardRef<HiddenGameRef>((_, ref) => {
                     <Trophy className="w-16 h-16 text-amber-400 mx-auto mb-2" />
                   </motion.div>
                   <p className="text-3xl font-heading font-bold text-foreground">
-                    {score} points!
+                    {score} stars!
                   </p>
                   <p className="text-muted-foreground text-sm mt-1">
-                    {lives <= 0 ? "You ran out of lives!" : "Time's up!"}
+                    {score >= 30 ? "Amazing! ⭐" : score >= 20 ? "Great job! 🌟" : "Keep practicing! ✨"}
                   </p>
                 </div>
 
@@ -349,11 +233,12 @@ const HiddenGame = forwardRef<HiddenGameRef>((_, ref) => {
                     />
                     <motion.button
                       onClick={handleSubmitScore}
-                      className="w-full px-4 py-3 bg-emerald-400 text-white rounded-xl font-bold"
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
+                      disabled={isSavingScore}
+                      className="w-full px-4 py-3 bg-emerald-400 text-white rounded-xl font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+                      whileHover={{ scale: isSavingScore ? 1 : 1.02 }}
+                      whileTap={{ scale: isSavingScore ? 1 : 0.98 }}
                     >
-                      Save Score
+                      {isSavingScore ? "Saving..." : "Save Score"}
                     </motion.button>
                   </div>
                 )}
@@ -369,19 +254,22 @@ const HiddenGame = forwardRef<HiddenGameRef>((_, ref) => {
               </div>
             )}
 
-            {/* Leaderboard */}
             <div className="mt-6 pt-6 border-t-2 border-white/50">
               <h4 className="text-xl font-heading font-bold text-foreground flex items-center gap-2 mb-4">
                 <Trophy className="w-5 h-5 text-amber-400" />
                 Top Star Catchers
               </h4>
-              <div className="space-y-2 max-h-40 overflow-y-auto">
-                {leaderboard.length === 0 ? (
-                  <p className="text-center text-muted-foreground py-4">
+              <div className="space-y-2">
+                {isLoadingLeaderboard ? (
+                  <div className="text-center text-muted-foreground py-4">
+                    Loading leaderboard... ⏳
+                  </div>
+                ) : leaderboard.length === 0 ? (
+                  <div className="text-center text-muted-foreground py-4">
                     No scores yet! Be the first! ✨
-                  </p>
+                  </div>
                 ) : (
-                  leaderboard.slice(0, 5).map((entry, index) => (
+                  leaderboard.map((entry, index) => (
                     <motion.div
                       key={`${entry.name}-${entry.score}-${entry.date}`}
                       className={`flex items-center gap-3 px-4 py-2 rounded-xl ${

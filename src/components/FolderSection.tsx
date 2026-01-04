@@ -1,8 +1,8 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
-import { Briefcase, GraduationCap, BookOpen, ExternalLink } from "lucide-react";
+import { Briefcase, GraduationCap, BookOpen, ExternalLink, Code2 } from "lucide-react";
 
-type TabType = "work" | "publications" | "education";
+type TabType = "work" | "publications" | "education" | "techstack";
 
 interface WorkItem {
   title: string;
@@ -22,6 +22,11 @@ interface Education {
   school: string;
   period: string;
   details?: string;
+}
+
+interface TechCategory {
+  category: string;
+  technologies: string[];
 }
 
 const workHistory: WorkItem[] = [
@@ -93,6 +98,29 @@ const education: Education[] = [
   },
 ];
 
+const techStack: TechCategory[] = [
+  {
+    category: "Languages",
+    technologies: ["Python", "JavaScript", "TypeScript", "SQL", "Ruby"],
+  },
+  {
+    category: "Frameworks & Libraries",
+    technologies: ["React", "Next.js", "Node.js", "Flask", "Ruby on Rails", "TailwindCSS"],
+  },
+  {
+    category: "AI/ML",
+    technologies: ["PyTorch", "TensorFlow", "Stable Diffusion", "YOLO", "Scikit-learn"],
+  },
+  {
+    category: "Databases",
+    technologies: ["MongoDB", "PostgreSQL", "MySQL", "Neo4j", "Firebase"],
+  },
+  {
+    category: "Tools & Platforms",
+    technologies: ["Git", "Docker", "AWS", "OpenStreetMap", "Selenium", "Streamlit"],
+  },
+];
+
 const FolderSection = () => {
   const [activeTab, setActiveTab] = useState<TabType>("work");
 
@@ -100,6 +128,7 @@ const FolderSection = () => {
     { id: "work", label: "Work", icon: <Briefcase className="w-5 h-5" />, bgColor: "bg-rose-200", lightBg: "bg-rose-100" },
     { id: "publications", label: "Publications", icon: <BookOpen className="w-5 h-5" />, bgColor: "bg-violet-200", lightBg: "bg-violet-100" },
     { id: "education", label: "Education", icon: <GraduationCap className="w-5 h-5" />, bgColor: "bg-emerald-200", lightBg: "bg-emerald-100" },
+    { id: "techstack", label: "Tech Stack", icon: <Code2 className="w-5 h-5" />, bgColor: "bg-amber-200", lightBg: "bg-amber-100" },
   ];
 
   const activeTabConfig = tabs.find(t => t.id === activeTab)!;
@@ -371,6 +400,70 @@ const FolderSection = () => {
                                 )}
                               </div>
                             </div>
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+
+                {/* Tech Stack */}
+                {activeTab === "techstack" && (
+                  <motion.div
+                    key="techstack"
+                    initial={{ opacity: 0, x: -30, scale: 0.95 }}
+                    animate={{ opacity: 1, x: 0, scale: 1 }}
+                    exit={{ opacity: 0, x: 30, scale: 0.95 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                    className="space-y-6"
+                  >
+                    <motion.h3 
+                      className="text-3xl font-display font-bold text-amber-800 flex items-center gap-3"
+                      initial={{ y: -20, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      transition={{ delay: 0.1 }}
+                    >
+                      <motion.div
+                        animate={{ rotate: [0, 15, -15, 0] }}
+                        transition={{ duration: 0.6, delay: 0.2 }}
+                      >
+                        <Code2 className="w-8 h-8 text-amber-600" />
+                      </motion.div>
+                      Tech Stack
+                    </motion.h3>
+                    <div className="space-y-4">
+                      {techStack.map((category, index) => (
+                        <motion.div
+                          key={index}
+                          className="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-sm"
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ 
+                            delay: 0.2 + index * 0.1,
+                            type: "spring",
+                            stiffness: 200,
+                            damping: 20
+                          }}
+                          whileHover={{ 
+                            scale: 1.02,
+                            boxShadow: "0 6px 25px rgba(0,0,0,0.1)",
+                            transition: { duration: 0.2 }
+                          }}
+                        >
+                          <h4 className="font-bold text-amber-800 text-lg mb-3">{category.category}</h4>
+                          <div className="flex flex-wrap gap-2">
+                            {category.technologies.map((tech, i) => (
+                              <motion.span
+                                key={i}
+                                className="px-3 py-1.5 bg-amber-100 text-amber-800 rounded-lg text-sm font-medium"
+                                initial={{ opacity: 0, scale: 0.8 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ delay: 0.3 + index * 0.1 + i * 0.05 }}
+                                whileHover={{ scale: 1.1, backgroundColor: "rgb(254 243 199)" }}
+                              >
+                                {tech}
+                              </motion.span>
+                            ))}
                           </div>
                         </motion.div>
                       ))}
