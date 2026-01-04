@@ -123,16 +123,18 @@ a, button, [role="button"] {
   cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 24 24' fill='%23DDA0DD'%3E%3Cpath d='M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z'/%3E%3C/svg%3E"), pointer;
 }
 
-/* Paper texture effect - enhanced crushed paper look */
+/* Paper texture effect - subtle grain */
 .paper-texture {
-  background-image: 
-    /* Crushed paper wrinkles */
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='crumple'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.03' numOctaves='5' seed='2'/%3E%3CfeDisplacementMap in='SourceGraphic' scale='15'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23crumple)' fill='%23f5f0e8' opacity='0.3'/%3E%3C/svg%3E"),
-    /* Fine paper grain */
-    url("data:image/svg+xml,%3Csvg width='200' height='200' viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.08'/%3E%3C/svg%3E"),
-    /* Subtle wrinkle lines */
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Cdefs%3E%3Cpattern id='wrinkles' patternUnits='userSpaceOnUse' width='150' height='150'%3E%3Cpath d='M0 30 Q40 25 75 30 T150 30' fill='none' stroke='%23d4c4b0' stroke-width='1' opacity='0.4'/%3E%3Cpath d='M0 60 Q35 65 75 60 T150 60' fill='none' stroke='%23d4c4b0' stroke-width='0.8' opacity='0.35'/%3E%3Cpath d='M0 90 Q45 85 75 90 T150 90' fill='none' stroke='%23d4c4b0' stroke-width='1' opacity='0.4'/%3E%3Cpath d='M0 120 Q30 125 75 120 T150 120' fill='none' stroke='%23d4c4b0' stroke-width='0.8' opacity='0.3'/%3E%3Cpath d='M30 0 Q25 40 30 75 T30 150' fill='none' stroke='%23d4c4b0' stroke-width='0.7' opacity='0.25'/%3E%3Cpath d='M90 0 Q95 35 90 75 T90 150' fill='none' stroke='%23d4c4b0' stroke-width='0.7' opacity='0.25'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23wrinkles)'/%3E%3C/svg%3E");
-  box-shadow: inset 0 0 20px rgba(0,0,0,0.03);
+  position: relative;
+}
+
+.paper-texture::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  border-radius: inherit;
 }
 
 /* Stacking animations */
