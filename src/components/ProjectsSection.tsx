@@ -89,14 +89,13 @@ const ProjectsSection = () => {
             My Projects
           </h2>
           <p className="text-muted-foreground flex items-center justify-center gap-2">
-            <Sparkles className="w-4 h-4" />
             Click the top card to see the next project
             <Sparkles className="w-4 h-4" />
           </p>
         </motion.div>
 
         {/* Stacked cards container */}
-        <div className="relative h-[600px] flex items-center justify-center">
+        <div className="relative h-[500px] flex items-center justify-center">
           {projects.map((project, index) => {
             const position = (index - currentIndex + projects.length) % projects.length;
             const isVisible = position < 3;

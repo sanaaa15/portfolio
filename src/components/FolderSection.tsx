@@ -169,7 +169,7 @@ const FolderSection = () => {
           }`} />
 
           {/* Folder tabs at top */}
-          <div className="flex gap-0 relative z-10">
+          <div className="flex gap-0 relative z-10 mb-0">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
@@ -418,7 +418,7 @@ const FolderSection = () => {
                     className="space-y-6"
                   >
                     <motion.h3 
-                      className="text-3xl font-display font-bold text-amber-800 flex items-center gap-3"
+                      className="text-3xl font-heading font-bold text-amber-800 flex items-center gap-3"
                       initial={{ y: -20, opacity: 0 }}
                       animate={{ y: 0, opacity: 1 }}
                       transition={{ delay: 0.1 }}

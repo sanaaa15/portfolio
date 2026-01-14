@@ -21,7 +21,7 @@ const Footer = () => {
             <div className="absolute -top-2 right-1/4 w-12 h-5 bg-tab-pink/70 transform rotate-3 rounded-sm" />
 
             <motion.h3
-              className="text-3xl font-display font-bold text-foreground mb-4"
+              className="text-3xl font-heading font-bold text-foreground mb-4"
               whileHover={{ scale: 1.05 }}
             >
               Let's Connect! 💌

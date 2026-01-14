@@ -3,10 +3,15 @@ import profilePhoto from "@/assets/profile-photo.png";
 import {
   Star,
   Heart,
-  Flower2,
+  Flower,
   Snowflake,
   Smile,
   Candy,
+  Sparkle,
+  Moon,
+  Sparkles,
+  Paperclip,
+  ChevronDown,
 } from "lucide-react";
 
 interface IntroSectionProps {
@@ -19,7 +24,7 @@ const floatingIcons = [
   {
     Icon: Star,
     color: "text-rose-400",
-    position: { top: "-2rem", left: "8%" },
+    position: { top: "-4rem", left: "8%" },
     rotation: -12,
     floatAmount: 8,
     floatDuration: 4.2,
@@ -29,7 +34,7 @@ const floatingIcons = [
   {
     Icon: Heart,
     color: "text-pink-400",
-    position: { top: "-1.5rem", left: "45%" },
+    position: { top: "-6rem", left: "45%" },
     rotation: 8,
     floatAmount: 10,
     floatDuration: 3.8,
@@ -37,31 +42,31 @@ const floatingIcons = [
     showOn: "all",
   },
   {
-    Icon: Flower2,
+    Icon: Candy,
     color: "text-fuchsia-300",
-    position: { top: "-1rem", right: "12%" },
+    position: { top: "-3rem", right: "12%" },
     rotation: 15,
     floatAmount: 6,
     floatDuration: 4.5,
-    filled: false,
+    filled: true,
     showOn: "md+",
   },
   
   // Bottom zone icons
   {
-    Icon: Candy,
+    Icon: Sparkle,
     color: "text-pink-300",
-    position: { bottom: "-2rem", left: "15%" },
+    position: { bottom: "-6rem", left: "15%" },
     rotation: -8,
     floatAmount: 7,
     floatDuration: 4.0,
-    filled: true,
+    filled: false,
     showOn: "md+",
   },
   {
     Icon: Snowflake,
     color: "text-cyan-300",
-    position: { bottom: "-1.5rem", right: "20%" },
+    position: { bottom: "-5rem", right: "20%" },
     rotation: 20,
     floatAmount: 9,
     floatDuration: 3.6,
@@ -73,7 +78,7 @@ const floatingIcons = [
   {
     Icon: Smile,
     color: "text-amber-400",
-    position: { top: "25%", left: "-3rem" },
+    position: { top: "25%", left: "-10rem" },
     rotation: -5,
     floatAmount: 8,
     floatDuration: 4.3,
@@ -84,7 +89,7 @@ const floatingIcons = [
   {
     Icon: Heart,
     color: "text-rose-300",
-    position: { top: "60%", left: "-2.5rem" },
+    position: { top: "75%", left: "-4.5rem" },
     rotation: 12,
     floatAmount: 6,
     floatDuration: 3.9,
@@ -94,33 +99,23 @@ const floatingIcons = [
   
   // Right side icons (large screens only)
   {
-    Icon: Star,
-    color: "text-amber-300",
-    position: { top: "20%", right: "-3rem" },
-    rotation: 18,
-    floatAmount: 10,
-    floatDuration: 4.1,
-    filled: true,
-    showOn: "lg+",
-  },
-  {
-    Icon: Candy,
+    Icon: Flower,
     color: "text-fuchsia-400",
-    position: { top: "55%", right: "-2.5rem" },
+    position: { top: "30%", right: "-8rem" },
     rotation: -15,
     floatAmount: 7,
     floatDuration: 3.7,
-    filled: true,
+    filled: false,
     showOn: "lg+",
   },
   {
-    Icon: Flower2,
+    Icon: Moon,
     color: "text-pink-400",
-    position: { bottom: "15%", right: "-2rem" },
+    position: { bottom: "25%", right: "-4.5rem" },
     rotation: 8,
     floatAmount: 9,
     floatDuration: 4.4,
-    filled: false,
+    filled: true,
     showOn: "lg+",
   },
 ];
@@ -189,33 +184,23 @@ const FloatingIcon = ({
 
 const IntroSection = ({ onOpenGame }: IntroSectionProps) => {
   return (
-    <section className="min-h-screen flex items-center justify-center px-4 py-12 md:py-16 overflow-visible">
+    <section className="min-h-screen flex items-center justify-center px-4 py-12 md:py-16 overflow-visible relative">
       {/* RELATIVE WRAPPER = anchor for all icons */}
-      <div className="relative w-full max-w-4xl mx-auto">
+      <div className="relative w-full max-w-4xl mx-auto" style={{ padding: '20px' }}>
         {/* Floating sticker icons - positioned relative to this wrapper */}
-        <div className="absolute inset-0 pointer-events-none" style={{ margin: "-3rem" }}>
+        <div className="absolute inset-0 pointer-events-none" style={{ margin: "-3rem", zIndex: 10 }}>
           {floatingIcons.map((icon, i) => (
             <FloatingIcon key={i} {...icon} onClick={onOpenGame} />
           ))}
         </div>
 
-        {/* Paper stack background layers */}
-        <motion.div
-          className="absolute inset-0 bg-paper-lavender rounded-2xl rotate-2 paper-texture"
-          initial={{ scale: 0.95 }}
-        />
-        <motion.div
-          className="absolute inset-0 bg-paper-mint rounded-2xl -rotate-1 paper-texture"
-          initial={{ scale: 0.97 }}
-        />
-
-        {/* Main Card */}
-        <motion.div
-          className="relative bg-paper-cream rounded-2xl p-6 md:p-10 paper-texture shadow-paper-lg"
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7 }}
-        >
+        {/* Main card */}
+        <div className="relative">
+        <motion.div className="relative bg-paper-cream rounded-2xl p-8 text-center paper-texture shadow-paper">
+          {/* Decorative tape */}
+          <div className="absolute -top-3 left-1/4 w-14 h-6 bg-tab-yellow/70 transform -rotate-6 rounded-sm" />
+          <div className="absolute -bottom-3 right-1/4 w-24 h-5 bg-tab-pink/70 transform -rotate-10 rounded-sm" />
+          
           <div className="flex flex-col md:flex-row items-center gap-6 md:gap-10">
             {/* Profile photo with decorative frame */}
             <motion.div
@@ -225,8 +210,8 @@ const IntroSection = ({ onOpenGame }: IntroSectionProps) => {
             >
               {/* Photo frame layers */}
               <div className="absolute inset-0 bg-tab-pink rounded-xl transform rotate-2 translate-x-1.5 translate-y-1.5" />
-              <div className="absolute inset-0 bg-tab-lavender rounded-xl transform -rotate-1 translate-x-0.5 translate-y-0.5" />
-              <div className="relative w-40 h-40 md:w-56 md:h-56 rounded-xl overflow-hidden border-4 border-paper-cream shadow-lg">
+              <div className="absolute inset-0 bg-tab-lavender rounded-xl transform -rotate-0 translate-x-0.5 translate-y-0.5" />
+              <div className="relative w-40 h-40 md:w-56 md:h-56 rounded-xl border-4 border-paper-cream overflow-hidden  shadow-lg">
                 <img
                   src={profilePhoto}
                   alt="Profile photo"
@@ -256,14 +241,14 @@ const IntroSection = ({ onOpenGame }: IntroSectionProps) => {
                   </p>
                 </div>
                 <p className="text-muted-foreground text-base mb-5 max-w-md">
-                  Based in Bangalore, India 🇮🇳
+                  Based in Bangalore, India
                   <br />
-                  Building beautiful things with code ✨
+                  Building beautiful things with code!
                 </p>
 
                 {/* Tags */}
                 <div className="flex flex-wrap gap-2 justify-center md:justify-start">
-                  {["AI/ML", "Full-Stack", "Research", "UI/UX"].map((tag, i) => (
+                  {["AI/ML", "Full-Stack", "Ruby On Rails"].map((tag, i) => (
                     <motion.span
                       key={tag}
                       className={`px-2.5 py-1 rounded-full text-sm font-medium ${
@@ -287,8 +272,42 @@ const IntroSection = ({ onOpenGame }: IntroSectionProps) => {
               </motion.div>
             </div>
           </div>
+          
+          {/* Icon hint message */}
+          <motion.div
+            className="absolute -bottom-14 left-1/2 transform -translate-x-1/2 text-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1, duration: 0.8 }}
+          >
+            <p className="text-sm text-muted-foreground font-medium flex items-center gap-1">
+              Click on any icon to play a game!
+              <Sparkles className="w-4 h-4" />
+            </p>
+          </motion.div>
         </motion.div>
+        </div>
       </div>
+      
+      {/* Scroll indicator - centered */}
+      <motion.div 
+        className="absolute bottom-8 left-0 right-0 flex flex-col items-center gap-2"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1, y: [0, 10, 0] }}
+        transition={{ 
+          opacity: { delay: 1.2, duration: 0.8 },
+          y: { duration: 2, repeat: Infinity }
+        }}
+      >
+        <span className="text-muted-foreground text-sm font-medium">Scroll to explore</span>
+        <div className="w-6 h-10 border-2 border-primary rounded-full flex justify-center pt-2">
+          <motion.div 
+            className="w-2 h-2 bg-primary rounded-full"
+            animate={{ y: [0, 12, 0] }}
+            transition={{ duration: 1.5, repeat: Infinity }}
+          />
+        </div>
+      </motion.div>
     </section>
   );
 };
